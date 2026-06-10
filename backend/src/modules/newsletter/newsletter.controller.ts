@@ -1,0 +1,35 @@
+import { Controller, Get, Post, Delete, Body, Query, Param, UseGuards } from '@nestjs/common';
+import { NewsletterService } from './newsletter.service';
+import { SubscribeDto } from './newsletter.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+
+@Controller()
+export class NewsletterController {
+  constructor(private newsletterService: NewsletterService) {}
+
+  @Post('newsletter/subscribe')
+  async subscribe(@Body() dto: SubscribeDto) {
+    return this.newsletterService.subscribe(dto.email);
+  }
+
+  @Post('newsletter/unsubscribe')
+  async unsubscribe(@Body() dto: SubscribeDto) {
+    return this.newsletterService.unsubscribe(dto.email);
+  }
+
+  @Get('admin/newsletter/subscribers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async getSubscribers(@Query('page') page?: number, @Query('limit') limit?: number) {
+    return this.newsletterService.getSubscribers(page, limit);
+  }
+
+  @Delete('admin/subscribers/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async deleteSubscriber(@Param('id') id: string) {
+    return this.newsletterService.deleteSubscriber(id);
+  }
+}
