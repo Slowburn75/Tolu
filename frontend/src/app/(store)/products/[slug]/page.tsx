@@ -25,7 +25,7 @@ import toast from "react-hot-toast";
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<any>(null);
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string>();
@@ -33,6 +33,8 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
+  const availableSizes = [...new Set(product?.variants?.map((v: any) => v.size).filter(Boolean) || [])] as string[];
+  const availableColors = [...new Set(product?.variants?.map((v: any) => v.color).filter(Boolean) || [])] as string[];
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -113,21 +115,21 @@ export default function ProductDetailPage() {
             <ProductInfo product={product} />
             <Separator />
 
-            {product.sizes && product.sizes.length > 0 && (
-              <SizeSelector selectedSize={selectedSize} onSelect={setSelectedSize} availableSizes={product.sizes} />
+            {availableSizes.length > 0 && (
+              <SizeSelector selectedSize={selectedSize} onSelect={setSelectedSize} availableSizes={availableSizes} />
             )}
 
-            {product.color && (
+            {availableColors.length > 0 && (
               <ColorSelector selectedColor={selectedColor} onSelect={setSelectedColor} />
             )}
 
-            <QuantitySelector value={quantity} onChange={setQuantity} max={product.stock} />
+            <QuantitySelector value={quantity} onChange={setQuantity} max={product.stockQuantity || 0} />
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button size="lg" className="flex-1 h-14 text-base" onClick={handleAddToCart} disabled={product.stock === 0}>
+              <Button size="lg" className="flex-1 h-14 text-base" onClick={handleAddToCart} disabled={!product.stockQuantity}>
                 Add to Cart
               </Button>
-              <Button size="lg" variant="outline" className="flex-1 h-14 text-base" onClick={handleBuyNow} disabled={product.stock === 0}>
+              <Button size="lg" variant="outline" className="flex-1 h-14 text-base" onClick={handleBuyNow} disabled={!product.stockQuantity}>
                 Buy Now
               </Button>
               <WishlistButton isInWishlist={isInWishlist(product.id)} onClick={handleWishlist} size="icon" />

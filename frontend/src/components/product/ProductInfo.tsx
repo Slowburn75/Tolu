@@ -24,12 +24,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={`h-4 w-4 ${i < Math.round(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+              className={`h-4 w-4 ${i < Math.round(product.averageRating || product.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
             />
           ))}
         </div>
         <span className="text-sm text-muted-foreground">
-          {product.rating.toFixed(1)} ({getRatingLabel(product.rating)}) - {product.reviewCount} reviews
+          {(product.averageRating || product.rating || 0).toFixed(1)} ({getRatingLabel(product.averageRating || product.rating || 0)}) - {product.reviewCount || product._count?.reviews || 0} reviews
         </span>
       </div>
 
