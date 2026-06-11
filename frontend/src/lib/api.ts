@@ -81,7 +81,7 @@ export const productsApi = {
   getNewArrivals: (limit?: number) => api.get("/products/new-arrivals", { limit }),
   getBestSellers: (limit?: number) => api.get("/products/best-sellers", { limit }),
   getSale: (limit?: number) => api.get("/products/sale", { limit }),
-  getRelated: (slug: string) => api.get(`/products/${slug}/related`),
+  getRelated: (slug: string) => api.get("/products", { limit: 4 }),
   search: (query: string) => api.get("/products/search", { q: query }),
 };
 
@@ -108,8 +108,8 @@ export const cartApi = {
 
 export const wishlistApi = {
   getWishlist: () => api.get("/wishlist"),
-  addToWishlist: (productId: string) => api.post("/wishlist", { productId }),
-  removeFromWishlist: (productId: string) => api.delete(`/wishlist/${productId}`),
+  addToWishlist: (productId: string) => api.post("/wishlist/items", { productId }),
+  removeFromWishlist: (productId: string) => api.delete(`/wishlist/items/${productId}`),
 };
 
 export const ordersApi = {

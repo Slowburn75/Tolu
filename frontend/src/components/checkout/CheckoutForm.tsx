@@ -114,6 +114,17 @@ export function CheckoutForm() {
             <div className="animate-fade-in">
               <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
               <PaymentMethod value={payment} onChange={setPayment} />
+              {payment === "bank_transfer" && (
+                <div className="bg-muted rounded-lg p-4 mt-4 space-y-2">
+                  <h4 className="font-medium text-sm">Bank Transfer Details</h4>
+                  <div className="text-sm space-y-1 text-muted-foreground">
+                    <p>Bank: GTBank</p>
+                    <p>Account Name: Tolumak Fashion Store</p>
+                    <p>Account Number: 0123456789</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Please use your order number as the transfer reference.</p>
+                </div>
+              )}
               <div className="flex justify-between mt-6">
                 <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
                 <Button onClick={() => setStep(3)}>Review Order</Button>

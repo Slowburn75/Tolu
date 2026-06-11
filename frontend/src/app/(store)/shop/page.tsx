@@ -29,7 +29,21 @@ export default function ShopPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res: any = await productsApi.getProducts({ ...filters, sort: sort === "latest" ? undefined : sort, page: pagination.page, limit: 12 });
+      const apiFilters: Record<string, string | number | boolean | undefined> = {
+        ...(filters.search && { search: filters.search }),
+        ...(filters.category && { categorySlug: filters.category }),
+        ...(filters.gender && { gender: filters.gender.toUpperCase() }),
+        ...(filters.ageGroup && { ageGroup: filters.ageGroup }),
+        ...(filters.minPrice !== undefined && { minPrice: filters.minPrice }),
+        ...(filters.maxPrice !== undefined && { maxPrice: filters.maxPrice }),
+        ...(filters.brand && { brandSlug: filters.brand }),
+        ...(filters.colors && filters.colors.length > 0 && { colors: filters.colors.join(",") }),
+        ...(filters.sizes && filters.sizes.length > 0 && { sizes: filters.sizes.join(",") }),
+        sort: sort === "latest" ? undefined : sort,
+        page: pagination.page,
+        limit: 12,
+      };
+      const res: any = await productsApi.getProducts(apiFilters);
       const data = Array.isArray(res) ? res : res?.data || [];
       setProducts(data);
       if (res?.meta) setPagination({ page: res.meta.page || 1, totalPages: res.meta.totalPages || 1 });

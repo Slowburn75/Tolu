@@ -40,11 +40,13 @@ export default function ProductDetailPage() {
       try {
         const res: any = await productsApi.getProduct(slug);
         setProduct(res?.data || res);
-        const relatedRes: any = await productsApi.getRelated(slug);
-        setRelated(Array.isArray(relatedRes) ? relatedRes : relatedRes?.data || []);
       } catch {
         setProduct(null);
-      } finally {
+      }
+      try {
+        const relatedRes: any = await productsApi.getRelated(slug);
+        setRelated(Array.isArray(relatedRes) ? relatedRes : relatedRes?.data || []);
+      } catch {} finally {
         setLoading(false);
       }
     };
