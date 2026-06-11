@@ -41,14 +41,16 @@ export class NewsletterService {
     return { message: 'Subscriber deleted successfully' };
   }
 
-  async getSubscribers(page = 1, limit = 20) {
-    const skip = (page - 1) * limit;
+  async getSubscribers(page?: number, limit?: number) {
+    const p = page && !isNaN(page) ? page : 1;
+    const l = limit && !isNaN(limit) ? limit : 20;
+    const skip = (p - 1) * l;
 
     const [subscribers, total] = await Promise.all([
       this.prisma.newsletterSubscriber.findMany({
         where: { isActive: true },
         skip,
-        take: limit,
+        take: l,
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.newsletterSubscriber.count({ where: { isActive: true } }),
@@ -56,7 +58,7 @@ export class NewsletterService {
 
     return {
       data: subscribers,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      meta: { page: p, limit: l, total, totalPages: Math.ceil(total / l) },
     };
   }
 }

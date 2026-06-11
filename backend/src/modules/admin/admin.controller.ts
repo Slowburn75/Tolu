@@ -25,4 +25,9 @@ export class AdminController {
   async getAnalytics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     return this.adminService.getAnalytics(startDate, endDate);
   }
+
+  @Get('settings')
+  async getSettings() {
+    return { storeName: 'Tolumak', currency: 'NGN', email: 'hello@tolumak.com', phone: '+2348000000000', address: 'Lagos, Nigeria' };
+  }
 }

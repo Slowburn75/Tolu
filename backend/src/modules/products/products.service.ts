@@ -259,10 +259,13 @@ export class ProductsService {
       if (existingSku) throw new ConflictException('SKU already exists');
     }
 
-    const data: any = { ...dto };
-    delete data.categoryIds;
-    delete data.images;
-    delete data.variants;
+    const scalarFields = ['name', 'description', 'sku', 'price', 'discountPrice', 'stockQuantity', 'material', 'weight', 'careInstructions', 'status', 'isFeatured', 'isNewArrival', 'isBestSeller', 'isSale', 'gender', 'ageGroup', 'brandId'] as const;
+    const data: Record<string, any> = {};
+    for (const field of scalarFields) {
+      if (dto[field] !== undefined) {
+        data[field] = dto[field];
+      }
+    }
 
     if (dto.name && dto.name !== product.name) {
       let slug = slugify.default(dto.name, { lower: true, strict: true });

@@ -18,6 +18,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
+import { BannersModule } from './modules/banners/banners.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { NewsletterModule } from './modules/newsletter/newsletter.module';
     AdminModule,
     DashboardModule,
     NewsletterModule,
+    BannersModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
