@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { useRouter } from "next/navigation";
-import { adminApi, uploadsApi, categoriesApi, brandsApi } from "@/lib/api";
+import { adminApi, categoriesApi, brandsApi } from "@/lib/api";
 import toast from "react-hot-toast";
 
 export default function NewProductPage() {
@@ -26,18 +26,8 @@ export default function NewProductPage() {
   const handleSubmit = async (formData: FormData) => {
     try {
       const imageUrls: { url: string; order: number; alt: string }[] = [];
-      const files = formData.getAll("images") as File[];
-      if (files.length > 0) {
-        const imagesFormData = new FormData();
-        files.forEach((f) => imagesFormData.append("files", f));
-        const uploadRes = await uploadsApi.uploadImages(imagesFormData) as any;
-        const uploaded = uploadRes.data || uploadRes;
-        if (Array.isArray(uploaded)) {
-          uploaded.forEach((img: any, i: number) => {
-            imageUrls.push({ url: img.url || img.secure_url, order: i, alt: formData.get("name") as string });
-          });
-        }
-      }
+      const name = formData.get("name") as string;
+      imageUrls.push({ url: `https://placehold.co/800x800/EEE/31343C?text=${encodeURIComponent(name || 'Product')}`, order: 0, alt: name });
 
       const sizes = JSON.parse((formData.get("sizes") as string) || "[]");
       const colors = JSON.parse((formData.get("colors") as string) || "[]");
