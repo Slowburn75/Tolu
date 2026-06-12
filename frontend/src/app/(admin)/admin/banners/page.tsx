@@ -18,15 +18,14 @@ export default function AdminBannersPage() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [editing, setEditing] = useState<Banner | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ title: "", subtitle: "", link: "", order: 1, isActive: true });
+  const [formData, setFormData] = useState({ title: "", subtitle: "", image: "", link: "", order: 1, isActive: true });
 
   const fetch = () => { adminApi.getBanners().then((res) => setBanners((res as { data: Banner[] }).data || [])); };
   useEffect(() => { fetch(); }, []);
 
   const handleSubmit = async () => {
     try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([k, v]) => data.append(k, String(v)));
+      const data = Object.fromEntries(Object.entries(formData).filter(([, value]) => value !== ""));
       if (editing) { await adminApi.updateBanner(editing.id, data); } else { await adminApi.createBanner(data); }
       toast.success(editing ? "Banner updated" : "Banner created");
       setIsOpen(false); setEditing(null); fetch();
@@ -45,7 +44,7 @@ export default function AdminBannersPage() {
     { header: "Active", cell: ({ row }) => row.original.isActive ? <Badge variant="success">Active</Badge> : <Badge variant="destructive">Inactive</Badge> },
     { id: "actions", cell: ({ row }) => (
       <div className="flex gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(row.original); setFormData({ title: row.original.title, subtitle: row.original.subtitle || "", link: row.original.link || "", order: row.original.order, isActive: row.original.isActive }); setIsOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(row.original); setFormData({ title: row.original.title, subtitle: row.original.subtitle || "", image: row.original.image || "", link: row.original.link || "", order: row.original.order, isActive: row.original.isActive }); setIsOpen(true); }}><Pencil className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(row.original.id)}><Trash2 className="h-4 w-4" /></Button>
       </div>
     )},
@@ -58,13 +57,14 @@ export default function AdminBannersPage() {
           <h1 className="text-2xl font-bold">Banners</h1>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2" onClick={() => { setEditing(null); setFormData({ title: "", subtitle: "", link: "", order: 1, isActive: true }); }}><Plus className="h-4 w-4" /> Add Banner</Button>
+              <Button className="gap-2" onClick={() => { setEditing(null); setFormData({ title: "", subtitle: "", image: "", link: "", order: 1, isActive: true }); }}><Plus className="h-4 w-4" /> Add Banner</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>{editing ? "Edit Banner" : "New Banner"}</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2"><Label>Title</Label><Input value={formData.title} onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))} /></div>
                 <div className="space-y-2"><Label>Subtitle</Label><Input value={formData.subtitle} onChange={(e) => setFormData((p) => ({ ...p, subtitle: e.target.value }))} /></div>
+                <div className="space-y-2"><Label>Image URL</Label><Input value={formData.image} onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))} /></div>
                 <div className="space-y-2"><Label>Link</Label><Input value={formData.link} onChange={(e) => setFormData((p) => ({ ...p, link: e.target.value }))} /></div>
                 <div className="space-y-2"><Label>Order</Label><Input type="number" value={formData.order} onChange={(e) => setFormData((p) => ({ ...p, order: parseInt(e.target.value) }))} /></div>
                 <Button className="w-full" onClick={handleSubmit}>Save</Button>

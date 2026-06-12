@@ -13,7 +13,7 @@ import { formatDate, formatPrice } from "@/lib/utils";
 import { ArrowLeft, Package, Truck, MapPin, CreditCard } from "lucide-react";
 import type { Order } from "@/types";
 
-const statusSteps = ["pending", "processing", "shipped", "delivered"];
+const statusSteps = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -61,7 +61,7 @@ export default function OrderDetailPage() {
                     }`}>
                       {i + 1}
                     </div>
-                    <span className="text-xs mt-2 capitalize">{step}</span>
+                    <span className="text-xs mt-2 capitalize">{step.toLowerCase().replace(/_/g, " ")}</span>
                   </div>
                 ))}
               </div>
@@ -76,7 +76,7 @@ export default function OrderDetailPage() {
                 <div>
                   <h4 className="text-sm font-medium">Shipping Address</h4>
                   <p className="text-sm text-muted-foreground">
-                    {order.shippingAddress?.fullName}<br />
+                    {order.shippingAddress?.fullName || `${order.shippingAddress?.firstName || ""} ${order.shippingAddress?.lastName || ""}`.trim()}<br />
                     {order.shippingAddress?.street}<br />
                     {order.shippingAddress?.city}, {order.shippingAddress?.state}
                   </p>
@@ -110,10 +110,10 @@ export default function OrderDetailPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 border rounded-lg p-4">
                     <div className="w-16 h-16 bg-muted rounded-md overflow-hidden shrink-0">
-                      <img src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.png"} alt={item.product.name} className="w-full h-full object-cover" />
+                      <img src={item.product?.images?.[0]?.url || item.product?.images?.[0] || "/placeholder.png"} alt={item.product?.name || item.name || ""} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{item.product.name}</p>
+                      <p className="text-sm font-medium">{item.product?.name || item.name}</p>
                       <p className="text-xs text-muted-foreground">Qty: {item.quantity} x {formatPrice(item.price)}</p>
                     </div>
                     <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
@@ -126,7 +126,7 @@ export default function OrderDetailPage() {
 
             <div className="space-y-2 max-w-xs ml-auto">
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(order.subtotal)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span>{order.shipping === 0 ? "Free" : formatPrice(order.shipping)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span>{(order.shippingFee ?? order.shipping ?? 0) === 0 ? "Free" : formatPrice(order.shippingFee ?? order.shipping ?? 0)}</span></div>
               {order.discount > 0 && <div className="flex justify-between text-sm text-green-600"><span>Discount</span><span>-{formatPrice(order.discount)}</span></div>}
               <Separator />
               <div className="flex justify-between font-semibold text-lg"><span>Total</span><span>{formatPrice(order.total)}</span></div>

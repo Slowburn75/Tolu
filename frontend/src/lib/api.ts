@@ -64,13 +64,15 @@ export const api = {
 
 export const authApi = {
   login: (data: { email: string; password: string }) => api.post("/auth/login", data),
-  register: (data: { name: string; email: string; password: string }) => api.post("/auth/register", data),
+  register: (data: { name: string; email: string; password: string; confirmPassword: string }) => api.post("/auth/register", data),
   logout: () => api.post("/auth/logout"),
-  refresh: (token: string) => api.post("/auth/refresh", { refreshToken: token }),
+  refresh: () => api.post("/auth/refresh"),
   getMe: () => api.get("/auth/me"),
-  updateProfile: (data: FormData | Record<string, unknown>) => api.put("/auth/profile", data),
+  updateProfile: (data: FormData | Record<string, unknown>) => api.patch("/auth/me", data),
+  changePassword: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
+    api.patch("/auth/change-password", data),
   forgotPassword: (email: string) => api.post("/auth/forgot-password", { email }),
-  resetPassword: (data: { token: string; password: string }) => api.post("/auth/reset-password", data),
+  resetPassword: (data: { token: string; password: string; confirmPassword: string }) => api.post("/auth/reset-password", data),
 };
 
 export const productsApi = {
@@ -97,13 +99,13 @@ export const brandsApi = {
 export const cartApi = {
   getCart: () => api.get("/cart"),
   addToCart: (data: { productId: string; quantity: number; size?: string; color?: string }) =>
-    api.post("/cart", data),
+    api.post("/cart/items", data),
   updateCartItem: (itemId: string, data: { quantity: number }) =>
-    api.put(`/cart/${itemId}`, data),
-  removeCartItem: (itemId: string) => api.delete(`/cart/${itemId}`),
+    api.patch(`/cart/items/${itemId}`, data),
+  removeCartItem: (itemId: string) => api.delete(`/cart/items/${itemId}`),
   clearCart: () => api.delete("/cart"),
-  applyCoupon: (code: string) => api.post("/cart/coupon", { code }),
-  removeCoupon: () => api.delete("/cart/coupon"),
+  applyCoupon: (code: string, orderAmount?: number) => api.post("/coupons/validate", { code, orderAmount }),
+  removeCoupon: () => Promise.resolve({ message: "Coupon removed" }),
 };
 
 export const wishlistApi = {
@@ -115,8 +117,9 @@ export const wishlistApi = {
 export const ordersApi = {
   createOrder: (data: Record<string, unknown>) => api.post("/orders", data),
   getMyOrders: (params?: Record<string, string | number | boolean | undefined>) =>
-    api.get("/orders/my-orders", params),
+    api.get("/orders/me", params),
   getOrder: (id: string) => api.get(`/orders/${id}`),
+  trackOrder: (data: { orderNumber: string; email: string }) => api.post("/orders/track", data),
   cancelOrder: (id: string) => api.put(`/orders/${id}/cancel`),
 };
 
@@ -128,10 +131,18 @@ export const reviewsApi = {
 };
 
 export const paymentsApi = {
-  initializePaystack: (data: { orderId: string; amount: number; email: string }) =>
+  initializePaystack: (data: { orderId: string; provider: "paystack"; callbackUrl?: string }) =>
     api.post("/payments/paystack/initialize", data),
-  initializeFlutterwave: (data: { orderId: string; amount: number; email: string }) =>
+  initializeFlutterwave: (data: { orderId: string; provider: "flutterwave"; callbackUrl?: string }) =>
     api.post("/payments/flutterwave/initialize", data),
+};
+
+export const addressesApi = {
+  getAddresses: () => api.get("/addresses"),
+  createAddress: (data: Record<string, unknown>) => api.post("/addresses", data),
+  updateAddress: (id: string, data: Record<string, unknown>) => api.patch(`/addresses/${id}`, data),
+  deleteAddress: (id: string) => api.delete(`/addresses/${id}`),
+  setDefault: (id: string) => api.patch(`/addresses/${id}/default`),
 };
 
 export const uploadsApi = {
@@ -143,43 +154,43 @@ export const uploadsApi = {
 export const adminApi = {
   getStats: () => api.get("/admin/dashboard"),
   getSales: (params?: Record<string, string | number | boolean | undefined>) =>
-    api.get("/admin/dashboard/sales-chart", params),
+    api.get("/dashboard/sales-chart", params),
   getProducts: (params?: Record<string, string | number | boolean | undefined>) =>
     api.get("/admin/products", params),
   createProduct: (data: Record<string, unknown>) => api.post("/admin/products", data),
   updateProduct: (id: string, data: Record<string, unknown>) => api.patch(`/admin/products/${id}`, data),
   deleteProduct: (id: string) => api.delete(`/admin/products/${id}`),
   getCategories: () => api.get("/admin/categories"),
-  createCategory: (data: FormData) => api.post("/admin/categories", data),
-  updateCategory: (id: string, data: FormData) => api.put(`/admin/categories/${id}`, data),
+  createCategory: (data: Record<string, unknown>) => api.post("/admin/categories", data),
+  updateCategory: (id: string, data: Record<string, unknown>) => api.patch(`/admin/categories/${id}`, data),
   deleteCategory: (id: string) => api.delete(`/admin/categories/${id}`),
-  getBrands: () => api.get("/admin/brands").catch(() => ({ data: [] })),
-  createBrand: (data: FormData) => api.post("/admin/brands", data),
-  updateBrand: (id: string, data: FormData) => api.put(`/admin/brands/${id}`, data),
+  getBrands: () => api.get("/admin/brands"),
+  createBrand: (data: Record<string, unknown>) => api.post("/admin/brands", data),
+  updateBrand: (id: string, data: Record<string, unknown>) => api.patch(`/admin/brands/${id}`, data),
   deleteBrand: (id: string) => api.delete(`/admin/brands/${id}`),
   getOrders: (params?: Record<string, string | number | boolean | undefined>) =>
     api.get("/admin/orders", params),
   getOrder: (id: string) => api.get(`/admin/orders/${id}`),
-  updateOrderStatus: (id: string, status: string) => api.put(`/admin/orders/${id}/status`, { status }),
+  updateOrderStatus: (id: string, status: string) => api.patch(`/admin/orders/${id}/status`, { status }),
   getCustomers: (params?: Record<string, string | number | boolean | undefined>) =>
     api.get("/admin/customers", params),
   getCustomer: (id: string) => api.get(`/admin/customers/${id}`),
   getCoupons: () => api.get("/admin/coupons"),
   createCoupon: (data: Record<string, unknown>) => api.post("/admin/coupons", data),
-  updateCoupon: (id: string, data: Record<string, unknown>) => api.put(`/admin/coupons/${id}`, data),
+  updateCoupon: (id: string, data: Record<string, unknown>) => api.patch(`/admin/coupons/${id}`, data),
   deleteCoupon: (id: string) => api.delete(`/admin/coupons/${id}`),
   getReviews: (params?: Record<string, string | number | boolean | undefined>) =>
-    api.get("/admin/reviews", params).catch(() => ({ data: [] })),
+    api.get("/admin/reviews", params),
   approveReview: (id: string) => api.patch(`/admin/reviews/${id}/approve`),
-  deleteReview: (id: string) => api.delete(`/admin/reviews/${id}`).catch(() => ({})),
-  getBanners: () => api.get("/admin/banners").catch(() => ({ data: [] })),
-  createBanner: (data: FormData) => api.post("/admin/banners", data).catch(() => ({})),
-  updateBanner: (id: string, data: FormData) => api.put(`/admin/banners/${id}`, data).catch(() => ({})),
-  deleteBanner: (id: string) => api.delete(`/admin/banners/${id}`).catch(() => ({})),
-  getSubscribers: () => api.get("/admin/newsletter/subscribers").catch(() => ({ data: [] })),
-  deleteSubscriber: (id: string) => api.delete(`/admin/subscribers/${id}`).catch(() => ({})),
-  getSettings: () => api.get("/admin/settings").catch(() => ({ data: null })),
-  updateSettings: (data: Record<string, unknown>) => api.put("/admin/settings", data).catch(() => ({})),
+  deleteReview: (id: string) => api.delete(`/admin/reviews/${id}`),
+  getBanners: () => api.get("/admin/banners"),
+  createBanner: (data: Record<string, unknown>) => api.post("/admin/banners", data),
+  updateBanner: (id: string, data: Record<string, unknown>) => api.patch(`/admin/banners/${id}`, data),
+  deleteBanner: (id: string) => api.delete(`/admin/banners/${id}`),
+  getSubscribers: () => api.get("/admin/newsletter/subscribers"),
+  deleteSubscriber: (id: string) => api.delete(`/admin/subscribers/${id}`),
+  getSettings: () => api.get("/admin/settings"),
+  updateSettings: (data: Record<string, unknown>) => api.patch("/admin/settings", data),
 };
 
 export const newsletterApi = {

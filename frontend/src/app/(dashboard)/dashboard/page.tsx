@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    ordersApi.getMyOrders({ limit: 5 }).then((res) => {
+    ordersApi.getMyOrders({ limit: 5 }).then((res: any) => {
       setRecentOrders(Array.isArray(res) ? res : res?.data || []);
     }).catch(() => {});
   }, []);

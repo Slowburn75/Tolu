@@ -26,7 +26,7 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await register({ name: formData.name, email: formData.email, password: formData.password });
+      await register({ name: formData.name, email: formData.email, password: formData.password, confirmPassword: formData.confirmPassword });
       toast.success("Account created successfully!");
       router.push("/dashboard");
     } catch {

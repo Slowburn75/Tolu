@@ -3,8 +3,10 @@ import { persist } from "zustand/middleware";
 import { wishlistApi } from "@/lib/api";
 import type { Product } from "@/types";
 
+type WishlistProduct = Product & { wishlistItemId?: string };
+
 interface WishlistState {
-  items: Product[];
+  items: WishlistProduct[];
   isLoading: boolean;
   fetchWishlist: () => Promise<void>;
   addItem: (product: Product) => Promise<void>;
@@ -21,9 +23,10 @@ export const useWishlistStore = create<WishlistState>()(
       fetchWishlist: async () => {
         set({ isLoading: true });
         try {
-          const res = await wishlistApi.getWishlist() as { success: boolean; data: { product: Product }[] };
-          if (res.data) {
-            set({ items: res.data.map((i: { product: Product }) => i.product), isLoading: false });
+          const res = await wishlistApi.getWishlist() as { data?: { items?: { id: string; product: Product }[] }; items?: { id: string; product: Product }[] };
+          const items = res.data?.items || res.items || [];
+          if (items) {
+            set({ items: items.map((i) => ({ ...i.product, wishlistItemId: i.id })), isLoading: false });
           }
         } catch {
           set({ isLoading: false });
@@ -34,6 +37,7 @@ export const useWishlistStore = create<WishlistState>()(
         set((state) => ({ items: [...state.items, product] }));
         try {
           await wishlistApi.addToWishlist(product.id);
+          await get().fetchWishlist();
         } catch {
           set((state) => ({ items: state.items.filter((i) => i.id !== product.id) }));
         }
@@ -41,9 +45,10 @@ export const useWishlistStore = create<WishlistState>()(
 
       removeItem: async (productId: string) => {
         const prev = get().items;
+        const item = prev.find((i) => i.id === productId);
         set((state) => ({ items: state.items.filter((i) => i.id !== productId) }));
         try {
-          await wishlistApi.removeFromWishlist(productId);
+          await wishlistApi.removeFromWishlist(item?.wishlistItemId || productId);
         } catch {
           set({ items: prev });
         }

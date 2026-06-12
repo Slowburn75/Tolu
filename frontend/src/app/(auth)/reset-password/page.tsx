@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
     }
     setLoading(true);
     try {
-      await authApi.resetPassword({ token, password });
+      await authApi.resetPassword({ token, password, confirmPassword });
       toast.success("Password reset successfully!");
       router.push("/login");
     } catch {

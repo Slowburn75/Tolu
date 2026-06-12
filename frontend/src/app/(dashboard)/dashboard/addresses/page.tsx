@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,37 +11,82 @@ import { Plus, MapPin, Pencil, Trash2, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Address } from "@/types";
+import { addressesApi } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function AddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [editing, setEditing] = useState<Address | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    label: "", fullName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria",
+    label: "", firstName: "", lastName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria",
   });
 
-  const handleSave = () => {
-    if (editing) {
-      setAddresses((prev) => prev.map((a) => a.id === editing.id ? { ...a, ...formData } : a));
-    } else {
-      setAddresses((prev) => [...prev, { ...formData, id: String(Date.now()), isDefault: prev.length === 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as Address]);
+  const fetchAddresses = () => {
+    setLoading(true);
+    addressesApi.getAddresses()
+      .then((res: any) => setAddresses(Array.isArray(res) ? res : res?.data || []))
+      .catch(() => toast.error("Failed to load addresses"))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchAddresses(); }, []);
+
+  const resetForm = () => {
+    setFormData({ label: "", firstName: "", lastName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria" });
+  };
+
+  const handleSave = async () => {
+    try {
+      if (editing) {
+        await addressesApi.updateAddress(editing.id, formData);
+        toast.success("Address updated");
+      } else {
+        await addressesApi.createAddress(formData);
+        toast.success("Address added");
+      }
+      setIsOpen(false);
+      setEditing(null);
+      resetForm();
+      fetchAddresses();
+    } catch {
+      toast.error("Failed to save address");
     }
-    setIsOpen(false);
-    setEditing(null);
-    setFormData({ label: "", fullName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria" });
   };
 
-  const handleDelete = (id: string) => {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await addressesApi.deleteAddress(id);
+      toast.success("Address deleted");
+      fetchAddresses();
+    } catch {
+      toast.error("Failed to delete address");
+    }
   };
 
-  const setDefault = (id: string) => {
-    setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
+  const setDefault = async (id: string) => {
+    try {
+      await addressesApi.setDefault(id);
+      fetchAddresses();
+    } catch {
+      toast.error("Failed to update default address");
+    }
   };
 
   const openEdit = (address: Address) => {
     setEditing(address);
-    setFormData({ label: address.label, fullName: address.fullName, phone: address.phone, street: address.street, city: address.city, state: address.state, zipCode: address.zipCode || "", country: address.country });
+    setFormData({
+      label: address.label || "",
+      firstName: address.firstName || "",
+      lastName: address.lastName || "",
+      phone: address.phone,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode || "",
+      country: address.country,
+    });
     setIsOpen(true);
   };
 
@@ -52,7 +97,7 @@ export default function AddressesPage() {
           <CardTitle className="text-xl">My Addresses</CardTitle>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="gap-2"><Plus className="h-4 w-4" /> Add Address</Button>
+              <Button size="sm" className="gap-2" onClick={() => { setEditing(null); resetForm(); }}><Plus className="h-4 w-4" /> Add Address</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -61,7 +106,8 @@ export default function AddressesPage() {
               <div className="space-y-4">
                 <div className="space-y-2"><Label>Label</Label><Input value={formData.label} onChange={(e) => setFormData((p) => ({ ...p, label: e.target.value }))} placeholder="e.g. Home, Office" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Full Name</Label><Input value={formData.fullName} onChange={(e) => setFormData((p) => ({ ...p, fullName: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>First Name</Label><Input value={formData.firstName} onChange={(e) => setFormData((p) => ({ ...p, firstName: e.target.value }))} /></div>
+                  <div className="space-y-2"><Label>Last Name</Label><Input value={formData.lastName} onChange={(e) => setFormData((p) => ({ ...p, lastName: e.target.value }))} /></div>
                   <div className="space-y-2"><Label>Phone</Label><Input value={formData.phone} onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))} /></div>
                 </div>
                 <div className="space-y-2"><Label>Street</Label><Input value={formData.street} onChange={(e) => setFormData((p) => ({ ...p, street: e.target.value }))} /></div>
@@ -77,7 +123,9 @@ export default function AddressesPage() {
           </Dialog>
         </CardHeader>
         <CardContent>
-          {addresses.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          ) : addresses.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium mb-1">No addresses saved</p>
@@ -89,7 +137,7 @@ export default function AddressesPage() {
                 <div key={address.id} className="border rounded-lg p-4 relative">
                   {address.isDefault && <Badge variant="info" className="absolute top-2 right-2 gap-1"><Star className="h-3 w-3" /> Default</Badge>}
                   <h4 className="font-medium mb-1">{address.label}</h4>
-                  <p className="text-sm text-muted-foreground">{address.fullName}</p>
+                  <p className="text-sm text-muted-foreground">{address.fullName || `${address.firstName || ""} ${address.lastName || ""}`.trim()}</p>
                   <p className="text-sm text-muted-foreground">{address.street}, {address.city}</p>
                   <p className="text-sm text-muted-foreground">{address.state}, {address.country}</p>
                   <p className="text-sm text-muted-foreground">{address.phone}</p>

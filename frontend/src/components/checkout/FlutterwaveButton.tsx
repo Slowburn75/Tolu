@@ -30,24 +30,15 @@ declare global {
 export function FlutterwaveButton({ orderId, amount, email, onSuccess, onError }: FlutterwaveButtonProps) {
   const handlePayment = async () => {
     try {
-      const res = await paymentsApi.initializeFlutterwave({ orderId, amount, email }) as { data: { tx_ref: string } };
-      const key = process.env.NEXT_PUBLIC_FLUTTERWAVE_KEY || "";
+      const res = await paymentsApi.initializeFlutterwave({
+        orderId,
+        provider: "flutterwave",
+        callbackUrl: `${window.location.origin}/checkout/success?orderId=${orderId}`,
+      }) as { authorizationUrl?: string; data?: { authorizationUrl?: string } };
+      const authorizationUrl = res.authorizationUrl || res.data?.authorizationUrl;
 
-      if (typeof window !== "undefined" && window.FlutterwaveCheckout) {
-        window.FlutterwaveCheckout({
-          public_key: key,
-          tx_ref: res.data.tx_ref,
-          amount,
-          currency: "NGN",
-          payment_options: "card,mobilemoney,ussd",
-          customer: { email, name: "Customer" },
-          callback: (response) => {
-            if (response.status === "success") {
-              onSuccess?.();
-            }
-          },
-          onclose: () => toast.error("Payment cancelled"),
-        });
+      if (authorizationUrl) {
+        window.location.href = authorizationUrl;
       }
     } catch {
       toast.error("Payment initialization failed");

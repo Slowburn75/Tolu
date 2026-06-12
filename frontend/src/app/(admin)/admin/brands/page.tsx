@@ -17,20 +17,17 @@ export default function AdminBrandsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [editing, setEditing] = useState<Brand | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", slug: "", description: "" });
+  const [formData, setFormData] = useState({ name: "", description: "" });
 
   const fetch = () => { adminApi.getBrands().then((res) => setBrands((res as { data: Brand[] }).data || [])); };
   useEffect(() => { fetch(); }, []);
 
   const handleSubmit = async () => {
     try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("slug", formData.slug);
-      data.append("description", formData.description);
+      const data = Object.fromEntries(Object.entries(formData).filter(([, value]) => Boolean(value)));
       if (editing) { await adminApi.updateBrand(editing.id, data); } else { await adminApi.createBrand(data); }
       toast.success(editing ? "Brand updated" : "Brand created");
-      setIsOpen(false); setEditing(null); setFormData({ name: "", slug: "", description: "" });
+      setIsOpen(false); setEditing(null); setFormData({ name: "", description: "" });
       fetch();
     } catch { toast.error("Failed to save brand"); }
   };
@@ -45,7 +42,7 @@ export default function AdminBrandsPage() {
     { accessorKey: "slug", header: "Slug" },
     { id: "actions", cell: ({ row }) => (
       <div className="flex gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(row.original); setFormData({ name: row.original.name, slug: row.original.slug, description: row.original.description || "" }); setIsOpen(true); }}>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(row.original); setFormData({ name: row.original.name, description: row.original.description || "" }); setIsOpen(true); }}>
           <Pencil className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(row.original.id)}><Trash2 className="h-4 w-4" /></Button>
@@ -60,13 +57,12 @@ export default function AdminBrandsPage() {
           <h1 className="text-2xl font-bold">Brands</h1>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2" onClick={() => { setEditing(null); setFormData({ name: "", slug: "", description: "" }); }}><Plus className="h-4 w-4" /> Add Brand</Button>
+              <Button className="gap-2" onClick={() => { setEditing(null); setFormData({ name: "", description: "" }); }}><Plus className="h-4 w-4" /> Add Brand</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>{editing ? "Edit Brand" : "New Brand"}</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2"><Label>Name</Label><Input value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} /></div>
-                <div className="space-y-2"><Label>Slug</Label><Input value={formData.slug} onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))} /></div>
                 <div className="space-y-2"><Label>Description</Label><Input value={formData.description} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} /></div>
                 <Button className="w-full" onClick={handleSubmit}>Save</Button>
               </div>

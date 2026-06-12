@@ -189,10 +189,41 @@ export class OrdersService {
     return order;
   }
 
-  async findAll(page = 1, limit = 20, status?: string, search?: string) {
+  async track(orderNumber: string, email: string) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        orderNumber,
+        user: { email },
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        paymentStatus: true,
+        total: true,
+        trackingNumber: true,
+        courier: true,
+        createdAt: true,
+        items: {
+          select: {
+            id: true,
+            name: true,
+            quantity: true,
+            price: true,
+          },
+        },
+      },
+    });
+
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
+  }
+
+  async findAll(page = 1, limit = 20, status?: string, search?: string, userId?: string) {
     const skip = (page - 1) * limit;
     const where: any = {};
 
+    if (userId) where.userId = userId;
     if (status) where.status = status;
     if (search) {
       where.OR = [
@@ -228,7 +259,9 @@ export class OrdersService {
 
     const validStatuses = ['PENDING', 'PAID', 'PROCESSING', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'RETURNED', 'REFUNDED'];
 
-    if (!validStatuses.includes(dto.status)) {
+    const status = dto.status.toUpperCase();
+
+    if (!validStatuses.includes(status)) {
       throw new BadRequestException('Invalid order status');
     }
 
@@ -236,10 +269,10 @@ export class OrdersService {
       throw new BadRequestException(`Cannot update status of ${order.status.toLowerCase()} order`);
     }
 
-    const updateData: any = { status: dto.status as OrderStatus };
+    const updateData: any = { status: status as OrderStatus };
 
-    if (dto.status === 'PAID') updateData.paidAt = new Date();
-    if (dto.status === 'DELIVERED') updateData.deliveredAt = new Date();
+    if (status === 'PAID') updateData.paidAt = new Date();
+    if (status === 'DELIVERED') updateData.deliveredAt = new Date();
 
     const updated = await this.prisma.order.update({
       where: { id },
@@ -248,7 +281,7 @@ export class OrdersService {
     });
 
     try {
-      await this.emailService.sendOrderStatusUpdateEmail(updated.user.email, updated.orderNumber, dto.status);
+      await this.emailService.sendOrderStatusUpdateEmail(updated.user.email, updated.orderNumber, status);
     } catch {}
 
     return updated;

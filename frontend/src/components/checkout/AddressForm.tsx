@@ -11,7 +11,8 @@ interface AddressFormProps {
 }
 
 export interface AddressFormData {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   street: string;
   city: string;
@@ -23,7 +24,7 @@ export interface AddressFormData {
 export function AddressForm({ onSubmit, defaultValues }: AddressFormProps) {
   const [formData, setFormData] = useState<AddressFormData>(
     defaultValues || {
-      fullName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria",
+      firstName: "", lastName: "", phone: "", street: "", city: "", state: "", zipCode: "", country: "Nigeria",
     }
   );
 
@@ -40,8 +41,12 @@ export function AddressForm({ onSubmit, defaultValues }: AddressFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required />
+          <Label htmlFor="firstName">First Name</Label>
+          <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Phone Number</Label>

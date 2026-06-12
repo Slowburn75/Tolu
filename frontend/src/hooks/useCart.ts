@@ -4,6 +4,7 @@ import { cartApi } from "@/lib/api";
 import type { CartItem, Product } from "@/types";
 
 interface LocalCartItem {
+  id?: string;
   productId: string;
   product: Product;
   quantity: number;
@@ -45,8 +46,9 @@ export const useCartStore = create<CartState>()(
         set({ isLoading: true });
         try {
           const res = await cartApi.getCart() as { success: boolean; data: { items: LocalCartItem[] } };
-          if (res.data?.items) {
-            set({ items: res.data.items, isLoading: false });
+          const items = (res as any).data?.items || (res as any).items;
+          if (items) {
+            set({ items, isLoading: false });
           }
         } catch {
           set({ isLoading: false });
@@ -67,18 +69,22 @@ export const useCartStore = create<CartState>()(
             items: [...state.items, { productId: product.id, product, quantity, size, color, savedForLater: false }],
           };
         });
+        cartApi.addToCart({ productId: product.id, quantity, size, color }).catch(() => {});
       },
 
       removeItem: (productId: string, size?: string, color?: string) => {
+        const item = get().items.find((i) => i.productId === productId && i.size === size && i.color === color);
         set((state) => ({
           items: state.items.filter(
             (item) => !(item.productId === productId && item.size === size && item.color === color)
           ),
         }));
+        if (item?.id) cartApi.removeCartItem(item.id).catch(() => {});
       },
 
       updateQuantity: (productId: string, quantity: number, size?: string, color?: string) => {
         if (quantity < 1) return;
+        const item = get().items.find((i) => i.productId === productId && i.size === size && i.color === color);
         set((state) => ({
           items: state.items.map((item) =>
             item.productId === productId && item.size === size && item.color === color
@@ -86,6 +92,7 @@ export const useCartStore = create<CartState>()(
               : item
           ),
         }));
+        if (item?.id) cartApi.updateCartItem(item.id, { quantity }).catch(() => {});
       },
 
       toggleSaveForLater: (productId: string, size?: string, color?: string) => {

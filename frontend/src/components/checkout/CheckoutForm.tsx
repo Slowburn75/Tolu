@@ -46,15 +46,16 @@ export function CheckoutForm() {
           color: i.color,
         })),
         shippingAddress: address,
-        paymentMethod: payment,
         deliveryMethod: delivery,
-      }) as { data: { id: string } };
-      setOrderId(res.data.id);
+      }) as { id?: string; data?: { id: string } };
+      const createdOrderId = res.id || res.data?.id;
+      if (!createdOrderId) throw new Error("Order ID missing");
+      setOrderId(createdOrderId);
 
       if (payment === "bank_transfer") {
         toast.success("Order placed! Awaiting payment confirmation.");
         clearCart();
-        router.push(`/checkout/success?orderId=${res.data.id}`);
+        router.push(`/checkout/success?orderId=${createdOrderId}`);
       }
     } catch {
       toast.error("Failed to place order");
@@ -138,7 +139,7 @@ export function CheckoutForm() {
                 <div>
                   <h3 className="font-medium mb-2">Shipping To</h3>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>{address?.fullName}</p>
+                    <p>{address ? `${address.firstName} ${address.lastName}` : ""}</p>
                     <p>{address?.street}, {address?.city}</p>
                     <p>{address?.state}, {address?.country}</p>
                     <p>{address?.phone}</p>

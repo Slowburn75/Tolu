@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const categorySchema = z.object({
   name: z.string().min(2),
-  slug: z.string().min(2),
   description: z.string().optional(),
   parentId: z.string().optional(),
 });
@@ -19,21 +18,18 @@ const categorySchema = z.object({
 interface CategoryFormProps {
   defaultValues?: z.infer<typeof categorySchema>;
   categories?: { id: string; name: string }[];
-  onSubmit: (data: FormData) => Promise<void>;
+  onSubmit: (data: Record<string, unknown>) => Promise<void>;
 }
 
 export function CategoryForm({ defaultValues, categories = [], onSubmit }: CategoryFormProps) {
   const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm({
     resolver: zodResolver(categorySchema),
-    defaultValues: defaultValues || { name: "", slug: "", description: "", parentId: "" },
+    defaultValues: defaultValues || { name: "", description: "", parentId: "" },
   });
 
   const handleFormSubmit = async (data: z.infer<typeof categorySchema>) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value) formData.append(key, value);
-    });
-    await onSubmit(formData);
+    const payload = Object.fromEntries(Object.entries(data).filter(([, value]) => Boolean(value)));
+    await onSubmit(payload);
   };
 
   return (
@@ -41,10 +37,6 @@ export function CategoryForm({ defaultValues, categories = [], onSubmit }: Categ
       <div className="space-y-2">
         <Label>Name</Label>
         <Input {...register("name")} />
-      </div>
-      <div className="space-y-2">
-        <Label>Slug</Label>
-        <Input {...register("slug")} />
       </div>
       <div className="space-y-2">
         <Label>Parent Category</Label>

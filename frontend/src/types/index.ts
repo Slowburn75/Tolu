@@ -1,3 +1,16 @@
+export interface ProductImage {
+  id?: string;
+  url: string;
+  publicId?: string;
+  alt?: string;
+  order?: number;
+}
+
+export interface ProductCount {
+  reviews?: number;
+  orderItems?: number;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -20,7 +33,8 @@ export interface Product {
   price: number;
   discountPrice?: number;
   stock: number;
-  images: string[];
+  stockQuantity?: number;
+  images: any[];
   thumbnail?: string;
   color?: string;
   sizes?: string[];
@@ -30,10 +44,13 @@ export interface Product {
   isFeatured: boolean;
   isNewArrival: boolean;
   isBestSeller: boolean;
-  isOnSale: boolean;
+  isOnSale?: boolean;
+  isSale?: boolean;
   saleEndDate?: string;
   rating: number;
   reviewCount: number;
+  averageRating?: number;
+  _count?: ProductCount;
   categoryId: string;
   category?: Category;
   brandId?: string;
@@ -72,14 +89,14 @@ export interface Brand {
 }
 
 export interface CartItem {
-  id: string;
+  id?: string;
   productId: string;
   product: Product;
   quantity: number;
   size?: string;
   color?: string;
   savedForLater: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Cart {
@@ -104,13 +121,14 @@ export interface Order {
   items: OrderItem[];
   status: OrderStatus;
   subtotal: number;
-  shipping: number;
+  shipping?: number;
+  shippingFee?: number;
   discount: number;
   tax: number;
   total: number;
   couponId?: string;
   coupon?: Coupon;
-  paymentMethod: string;
+  paymentMethod?: string;
   paymentStatus: PaymentStatus;
   paymentReference?: string;
   shippingAddress: Address;
@@ -126,7 +144,8 @@ export interface OrderItem {
   id: string;
   orderId: string;
   productId: string;
-  product: Product;
+  product?: Product;
+  name?: string;
   quantity: number;
   price: number;
   size?: string;
@@ -134,8 +153,8 @@ export interface OrderItem {
   createdAt: string;
 }
 
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+export type OrderStatus = "PENDING" | "PAID" | "PROCESSING" | "PACKED" | "SHIPPED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED" | "RETURNED" | "REFUNDED" | "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "pending" | "completed" | "failed" | "refunded";
 
 export interface Review {
   id: string;
@@ -154,8 +173,10 @@ export interface Review {
 export interface Address {
   id: string;
   userId?: string;
-  label: string;
-  fullName: string;
+  label?: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   phone: string;
   street: string;
   city: string;
@@ -170,10 +191,9 @@ export interface Address {
 export interface Coupon {
   id: string;
   code: string;
-  type: "percentage" | "fixed";
-  value: number;
+  discountType: "PERCENTAGE" | "FIXED";
+  discountValue: number;
   minOrderAmount?: number;
-  maxDiscount?: number;
   usageLimit?: number;
   usedCount: number;
   isActive: boolean;
@@ -240,6 +260,7 @@ export interface RegisterInput {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   phone?: string;
 }
 
@@ -276,9 +297,8 @@ export interface CreateReviewInput {
 
 export interface CreateOrderInput {
   items: { productId: string; quantity: number; size?: string; color?: string }[];
-  shippingAddressId: string;
-  billingAddressId?: string;
-  paymentMethod: string;
+  shippingAddress: Address;
+  billingAddress?: Address;
   deliveryMethod: string;
   couponCode?: string;
   note?: string;

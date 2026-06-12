@@ -15,19 +15,20 @@ import type { User, Order } from "@/types";
 export default function AdminCustomerDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const customerId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [customer, setCustomer] = useState<User | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      adminApi.getCustomer(params.id as string),
-      adminApi.getOrders({ userId: params.id }),
+      adminApi.getCustomer(customerId),
+      adminApi.getOrders({ userId: customerId }),
     ]).then(([customerRes, ordersRes]) => {
       setCustomer((customerRes as { data: User }).data);
       setOrders((ordersRes as { data: Order[] }).data || []);
     }).catch(() => router.push("/admin/customers")).finally(() => setLoading(false));
-  }, [params.id]);
+  }, [customerId]);
 
   if (loading) return <AdminLayout><div className="text-center py-12">Loading...</div></AdminLayout>;
   if (!customer) return <AdminLayout><div className="text-center py-12">Customer not found</div></AdminLayout>;

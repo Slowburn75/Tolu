@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { InitializePaymentDto, VerifyPaymentDto } from './payments.dto';
 
@@ -22,9 +22,10 @@ export class PaymentsService {
     };
   }
 
-  async initializePaystack(dto: InitializePaymentDto) {
+  async initializePaystack(userId: string, dto: InitializePaymentDto) {
     const order = await this.prisma.order.findUnique({ where: { id: dto.orderId } });
     if (!order) throw new NotFoundException('Order not found');
+    if (order.userId !== userId) throw new ForbiddenException('You can only pay for your own orders');
     if (order.paymentStatus === 'PAID') throw new BadRequestException('Order already paid');
 
     const headers = await this.getPaystackHeaders();
@@ -46,7 +47,7 @@ export class PaymentsService {
     return { authorizationUrl: data.data.authorization_url, reference: data.data.reference, accessCode: data.data.access_code };
   }
 
-  async verifyPaystack(dto: VerifyPaymentDto) {
+  async verifyPaystack(userId: string, dto: VerifyPaymentDto) {
     const headers = await this.getPaystackHeaders();
     const response = await fetch(`https://api.paystack.co/transaction/verify/${dto.reference}`, { headers });
     const data = await response.json();
@@ -58,6 +59,7 @@ export class PaymentsService {
     const metadata = data.data.metadata;
     const order = await this.prisma.order.findUnique({ where: { id: metadata.orderId } });
     if (!order) throw new NotFoundException('Order not found');
+    if (order.userId !== userId) throw new ForbiddenException('You can only verify your own payments');
 
     await this.prisma.order.update({
       where: { id: order.id },
@@ -85,9 +87,10 @@ export class PaymentsService {
     return { message: 'Payment verified successfully', orderId: order.id };
   }
 
-  async initializeFlutterwave(dto: InitializePaymentDto) {
+  async initializeFlutterwave(userId: string, dto: InitializePaymentDto) {
     const order = await this.prisma.order.findUnique({ where: { id: dto.orderId } });
     if (!order) throw new NotFoundException('Order not found');
+    if (order.userId !== userId) throw new ForbiddenException('You can only pay for your own orders');
     if (order.paymentStatus === 'PAID') throw new BadRequestException('Order already paid');
 
     const user = await this.prisma.user.findUnique({ where: { id: order.userId } });
@@ -112,7 +115,7 @@ export class PaymentsService {
     return { authorizationUrl: data.data.link, reference: data.data.tx_ref };
   }
 
-  async verifyFlutterwave(dto: VerifyPaymentDto) {
+  async verifyFlutterwave(userId: string, dto: VerifyPaymentDto) {
     const headers = await this.getFlutterwaveHeaders();
     const response = await fetch(`https://api.flutterwave.com/v3/transactions/verify_by_reference?tx_ref=${dto.reference}`, { headers });
     const data = await response.json();
@@ -124,6 +127,7 @@ export class PaymentsService {
     const meta = data.data.meta || {};
     const order = await this.prisma.order.findUnique({ where: { id: meta.orderId } });
     if (!order) throw new NotFoundException('Order not found');
+    if (order.userId !== userId) throw new ForbiddenException('You can only verify your own payments');
 
     await this.prisma.order.update({
       where: { id: order.id },

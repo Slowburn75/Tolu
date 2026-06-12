@@ -15,16 +15,17 @@ import toast from "react-hot-toast";
 
 export default function OrderTrackingPage() {
   const [orderNumber, setOrderNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderNumber.trim()) return;
+    if (!orderNumber.trim() || !email.trim()) return;
     setLoading(true);
     try {
-      const res = await ordersApi.getOrder(orderNumber) as { data: Order };
-      setOrder(res.data);
+      const res = await ordersApi.trackOrder({ orderNumber, email }) as Order | { data: Order };
+      setOrder("data" in res ? res.data : res);
     } catch {
       toast.error("Order not found");
       setOrder(null);
@@ -33,7 +34,7 @@ export default function OrderTrackingPage() {
     }
   };
 
-  const statusSteps = ["pending", "processing", "shipped", "delivered"];
+  const statusSteps = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
   const currentStep = order ? statusSteps.indexOf(order.status) : -1;
 
   return (
@@ -45,7 +46,7 @@ export default function OrderTrackingPage() {
           <p className="text-muted-foreground">Enter your order number to track your package</p>
         </div>
 
-        <form onSubmit={handleTrack} className="flex gap-2 max-w-md mx-auto mb-12">
+        <form onSubmit={handleTrack} className="grid gap-3 max-w-md mx-auto mb-12">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -55,6 +56,13 @@ export default function OrderTrackingPage() {
               className="pl-10 h-12"
             />
           </div>
+          <Input
+            type="email"
+            placeholder="Email used for the order"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12"
+          />
           <Button type="submit" className="h-12 px-6" disabled={loading}>
             {loading ? "Searching..." : "Track"}
           </Button>
@@ -65,7 +73,7 @@ export default function OrderTrackingPage() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Order #{order.orderNumber}</span>
-                <Badge variant={order.status === "delivered" ? "success" : order.status === "cancelled" ? "destructive" : "info"}>
+                <Badge variant={order.status === "DELIVERED" ? "success" : order.status === "CANCELLED" ? "destructive" : "info"}>
                   {order.status}
                 </Badge>
               </CardTitle>
@@ -91,7 +99,7 @@ export default function OrderTrackingPage() {
                       }`}>
                         {i + 1}
                       </div>
-                      <span className="text-xs mt-2 capitalize">{step}</span>
+                      <span className="text-xs mt-2 capitalize">{step.toLowerCase().replace(/_/g, " ")}</span>
                     </div>
                   ))}
                 </div>
@@ -115,7 +123,7 @@ export default function OrderTrackingPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between border rounded-lg p-3">
                     <div>
-                      <p className="text-sm font-medium">{item.product.name}</p>
+                      <p className="text-sm font-medium">{item.product?.name || item.name}</p>
                       <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                     <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>

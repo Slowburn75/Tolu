@@ -19,6 +19,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { BannersModule } from './modules/banners/banners.module';
+import { AddressesModule } from './modules/addresses/addresses.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { BannersModule } from './modules/banners/banners.module';
     DashboardModule,
     NewsletterModule,
     BannersModule,
+    AddressesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

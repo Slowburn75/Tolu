@@ -25,7 +25,7 @@ export default function AdminCategoriesPage() {
 
   useEffect(() => { fetch(); }, []);
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: Record<string, unknown>) => {
     try {
       if (editing) { await adminApi.updateCategory(editing.id, data); } else { await adminApi.createCategory(data); }
       toast.success(editing ? "Category updated" : "Category created");

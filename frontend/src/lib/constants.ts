@@ -49,18 +49,15 @@ export const footerLinks = {
 };
 
 export const genders = [
-  { label: "Male", value: "male" },
-  { label: "Female", value: "female" },
-  { label: "Kids", value: "kids" },
-  { label: "Unisex", value: "unisex" },
+  { label: "Male", value: "MALE" },
+  { label: "Female", value: "FEMALE" },
+  { label: "Kids", value: "KIDS" },
+  { label: "Unisex", value: "UNISEX" },
 ];
 
 export const ageGroups = [
-  { label: "Adults", value: "adults" },
-  { label: "Teens", value: "teens" },
-  { label: "Children", value: "children" },
-  { label: "Toddlers", value: "toddlers" },
-  { label: "Infants", value: "infants" },
+  { label: "Adults", value: "ADULT" },
+  { label: "Children", value: "CHILDREN" },
 ];
 
 export const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
@@ -86,12 +83,16 @@ export const colors = [
 ];
 
 export const orderStatuses = [
-  "pending",
-  "processing",
-  "shipped",
-  "delivered",
-  "cancelled",
-  "refunded",
+  "PENDING",
+  "PAID",
+  "PROCESSING",
+  "PACKED",
+  "SHIPPED",
+  "OUT_FOR_DELIVERY",
+  "DELIVERED",
+  "CANCELLED",
+  "RETURNED",
+  "REFUNDED",
 ];
 
 export const deliveryMethods = [

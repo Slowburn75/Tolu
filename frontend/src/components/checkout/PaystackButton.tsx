@@ -30,23 +30,15 @@ declare global {
 export function PaystackButton({ orderId, amount, email, onSuccess, onError }: PaystackButtonProps) {
   const handlePayment = async () => {
     try {
-      const res = await paymentsApi.initializePaystack({ orderId, amount, email }) as { data: { reference: string } };
-      const key = process.env.NEXT_PUBLIC_PAYSTACK_KEY || "";
+      const res = await paymentsApi.initializePaystack({
+        orderId,
+        provider: "paystack",
+        callbackUrl: `${window.location.origin}/checkout/success?orderId=${orderId}`,
+      }) as { authorizationUrl?: string; data?: { authorizationUrl?: string } };
+      const authorizationUrl = res.authorizationUrl || res.data?.authorizationUrl;
 
-      if (typeof window !== "undefined" && window.PaystackPop) {
-        const handler = window.PaystackPop.setup({
-          key,
-          email,
-          amount: amount * 100,
-          ref: res.data.reference,
-          onClose: () => toast.error("Payment cancelled"),
-          callback: (response) => {
-            if (response.status === "success") {
-              onSuccess?.();
-            }
-          },
-        });
-        handler.openIframe();
+      if (authorizationUrl) {
+        window.location.href = authorizationUrl;
       }
     } catch {
       toast.error("Payment initialization failed");

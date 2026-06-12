@@ -37,8 +37,8 @@ export default function AdminCouponsPage() {
 
   const columns: ColumnDef<Coupon>[] = [
     { accessorKey: "code", header: "Code", cell: ({ row }) => <Badge variant="outline" className="uppercase font-mono">{row.original.code}</Badge> },
-    { accessorKey: "type", header: "Type", cell: ({ row }) => <Badge variant="secondary">{row.original.type}</Badge> },
-    { accessorKey: "value", header: "Value", cell: ({ row }) => row.original.type === "percentage" ? `${row.original.value}%` : formatPrice(row.original.value) },
+    { accessorKey: "discountType", header: "Type", cell: ({ row }) => <Badge variant="secondary">{row.original.discountType}</Badge> },
+    { accessorKey: "discountValue", header: "Value", cell: ({ row }) => row.original.discountType === "PERCENTAGE" ? `${row.original.discountValue}%` : formatPrice(row.original.discountValue) },
     { accessorKey: "usedCount", header: "Used" },
     { accessorKey: "isActive", header: "Active", cell: ({ row }) => row.original.isActive ? <Badge variant="success">Active</Badge> : <Badge variant="destructive">Inactive</Badge> },
     { accessorKey: "expiresAt", header: "Expires", cell: ({ row }) => row.original.expiresAt ? formatDate(row.original.expiresAt) : "Never" },

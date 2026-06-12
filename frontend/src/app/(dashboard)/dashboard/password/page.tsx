@@ -23,7 +23,11 @@ export default function PasswordPage() {
     }
     setLoading(true);
     try {
-      await authApi.updateProfile({ currentPassword: formData.currentPassword, newPassword: formData.newPassword } as unknown as Record<string, unknown>);
+      await authApi.changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+        confirmPassword: formData.confirmPassword,
+      });
       toast.success("Password updated!");
       setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch {

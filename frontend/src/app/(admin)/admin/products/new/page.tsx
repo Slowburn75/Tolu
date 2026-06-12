@@ -55,7 +55,7 @@ export default function NewProductPage() {
         isFeatured: formData.get("isFeatured") === "true",
         isNewArrival: formData.get("isNewArrival") === "true",
         isBestSeller: formData.get("isBestSeller") === "true",
-        isSale: formData.get("isOnSale") === "true",
+        isSale: formData.get("isSale") === "true",
         images: imageUrls.length > 0 ? imageUrls : undefined,
         variants: variants.length > 0 ? variants : undefined,
       };

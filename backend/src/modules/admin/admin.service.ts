@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -89,6 +89,21 @@ export class AdminService {
     ]);
 
     return { data: users, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async getCustomer(id: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id, role: 'USER' },
+      select: {
+        id: true, name: true, email: true, phone: true, avatar: true,
+        isBlocked: true, isEmailVerified: true, createdAt: true, updatedAt: true,
+        addresses: true,
+        _count: { select: { orders: true, reviews: true } },
+      },
+    });
+
+    if (!user) throw new NotFoundException('Customer not found');
+    return user;
   }
 
   async getAnalytics(startDate?: string, endDate?: string) {

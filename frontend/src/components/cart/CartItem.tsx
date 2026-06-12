@@ -42,19 +42,19 @@ export function CartItem({ item }: CartItemProps) {
         <p className="text-sm font-medium mt-1">{formatPrice(price)}</p>
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center border rounded-md">
-            <button className="p-1 hover:bg-accent" onClick={() => updateQuantity(item.productId, item.quantity - 1)}>
+            <button className="p-1 hover:bg-accent" onClick={() => updateQuantity(item.productId, item.quantity - 1, item.size, item.color)}>
               <Minus className="h-3 w-3" />
             </button>
             <span className="px-3 text-sm font-medium">{item.quantity}</span>
-            <button className="p-1 hover:bg-accent" onClick={() => updateQuantity(item.productId, item.quantity + 1)}>
+            <button className="p-1 hover:bg-accent" onClick={() => updateQuantity(item.productId, item.quantity + 1, item.size, item.color)}>
               <Plus className="h-3 w-3" />
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="text-xs" onClick={() => toggleSaveForLater(item.productId)}>
+            <Button variant="ghost" size="sm" className="text-xs" onClick={() => toggleSaveForLater(item.productId, item.size, item.color)}>
               Save for later
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.productId)}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.productId, item.size, item.color)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

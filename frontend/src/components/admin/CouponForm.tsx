@@ -9,13 +9,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const optionalNumber = (min: number) =>
+  z.preprocess((value) => value === "" || value === null ? undefined : value, z.coerce.number().min(min).optional());
+
 const couponSchema = z.object({
   code: z.string().min(3),
-  type: z.enum(["percentage", "fixed"]),
-  value: z.coerce.number().min(1),
-  minOrderAmount: z.coerce.number().min(0).optional(),
-  maxDiscount: z.coerce.number().min(0).optional(),
-  usageLimit: z.coerce.number().min(0).optional(),
+  discountType: z.enum(["PERCENTAGE", "FIXED"]),
+  discountValue: z.coerce.number().min(1),
+  minOrderAmount: optionalNumber(0),
+  usageLimit: optionalNumber(1),
   isActive: z.boolean().default(true),
   expiresAt: z.string().optional(),
 });
@@ -26,9 +28,9 @@ interface CouponFormProps {
 }
 
 export function CouponForm({ defaultValues, onSubmit }: CouponFormProps) {
-  const { register, handleSubmit, setValue, watch, formState: { isSubmitting } } = useForm({
+  const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm({
     resolver: zodResolver(couponSchema),
-    defaultValues: defaultValues || { code: "", type: "percentage", value: 0, isActive: true },
+    defaultValues: defaultValues || { code: "", discountType: "PERCENTAGE", discountValue: 0, isActive: true },
   });
 
   return (
@@ -40,25 +42,21 @@ export function CouponForm({ defaultValues, onSubmit }: CouponFormProps) {
         </div>
         <div className="space-y-2">
           <Label>Type</Label>
-          <Select onValueChange={(v) => setValue("type", v as "percentage" | "fixed")} defaultValue={defaultValues?.type || "percentage"}>
+          <Select onValueChange={(v) => setValue("discountType", v as "PERCENTAGE" | "FIXED")} defaultValue={defaultValues?.discountType || "PERCENTAGE"}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="percentage">Percentage</SelectItem>
-              <SelectItem value="fixed">Fixed Amount</SelectItem>
+              <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+              <SelectItem value="FIXED">Fixed Amount</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-2">
           <Label>Value</Label>
-          <Input type="number" {...register("value")} />
+          <Input type="number" {...register("discountValue")} />
         </div>
         <div className="space-y-2">
           <Label>Min Order (₦)</Label>
           <Input type="number" {...register("minOrderAmount")} />
-        </div>
-        <div className="space-y-2">
-          <Label>Max Discount (₦)</Label>
-          <Input type="number" {...register("maxDiscount")} />
         </div>
         <div className="space-y-2">
           <Label>Usage Limit</Label>

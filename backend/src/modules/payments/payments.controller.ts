@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { InitializePaymentDto, VerifyPaymentDto } from './payments.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('payments')
 export class PaymentsController {
@@ -9,26 +10,26 @@ export class PaymentsController {
 
   @Post('paystack/initialize')
   @UseGuards(JwtAuthGuard)
-  async initializePaystack(@Body() dto: InitializePaymentDto) {
-    return this.paymentsService.initializePaystack(dto);
+  async initializePaystack(@CurrentUser('id') userId: string, @Body() dto: InitializePaymentDto) {
+    return this.paymentsService.initializePaystack(userId, dto);
   }
 
   @Post('paystack/verify')
   @UseGuards(JwtAuthGuard)
-  async verifyPaystack(@Body() dto: VerifyPaymentDto) {
-    return this.paymentsService.verifyPaystack(dto);
+  async verifyPaystack(@CurrentUser('id') userId: string, @Body() dto: VerifyPaymentDto) {
+    return this.paymentsService.verifyPaystack(userId, dto);
   }
 
   @Post('flutterwave/initialize')
   @UseGuards(JwtAuthGuard)
-  async initializeFlutterwave(@Body() dto: InitializePaymentDto) {
-    return this.paymentsService.initializeFlutterwave(dto);
+  async initializeFlutterwave(@CurrentUser('id') userId: string, @Body() dto: InitializePaymentDto) {
+    return this.paymentsService.initializeFlutterwave(userId, dto);
   }
 
   @Post('flutterwave/verify')
   @UseGuards(JwtAuthGuard)
-  async verifyFlutterwave(@Body() dto: VerifyPaymentDto) {
-    return this.paymentsService.verifyFlutterwave(dto);
+  async verifyFlutterwave(@CurrentUser('id') userId: string, @Body() dto: VerifyPaymentDto) {
+    return this.paymentsService.verifyFlutterwave(userId, dto);
   }
 
   @Post('webhook/paystack')

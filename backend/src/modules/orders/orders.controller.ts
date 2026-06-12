@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto, UpdateTrackingDto } from './orders.dto';
+import { CreateOrderDto, UpdateOrderStatusDto, UpdateTrackingDto, TrackOrderDto } from './orders.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -15,6 +15,11 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   async create(@CurrentUser('id') userId: string, @Body() dto: CreateOrderDto) {
     return this.ordersService.create(userId, dto);
+  }
+
+  @Post('orders/track')
+  async track(@Body() dto: TrackOrderDto) {
+    return this.ordersService.track(dto.orderNumber, dto.email);
   }
 
   @Get('orders/me')
@@ -43,10 +48,17 @@ export class OrdersController {
     return this.ordersService.updateTracking(id, dto);
   }
 
+  @Get('admin/orders/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async adminFindById(@Param('id') id: string) {
+    return this.ordersService.findById(id);
+  }
+
   @Get('admin/orders')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  async findAll(@Query() query: PaginationDto & { status?: string }) {
-    return this.ordersService.findAll(query.page, query.limit, query.status, query.search);
+  async findAll(@Query() query: PaginationDto & { status?: string; userId?: string }) {
+    return this.ordersService.findAll(query.page, query.limit, query.status, query.search, query.userId);
   }
 }

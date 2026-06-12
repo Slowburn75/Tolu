@@ -14,7 +14,7 @@ export function SaveForLater() {
       <h3 className="font-semibold text-lg mb-4">Saved for Later ({savedItems.length})</h3>
       <div className="space-y-3">
         {savedItems.map((item) => (
-          <div key={item.productId} className="flex items-center justify-between border rounded-lg p-4">
+          <div key={`${item.productId}-${item.size}-${item.color}`} className="flex items-center justify-between border rounded-lg p-4">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 bg-muted rounded-md overflow-hidden">
                 <img
@@ -33,11 +33,11 @@ export function SaveForLater() {
             <div className="flex gap-2">
               <Button size="sm" onClick={() => {
                 addItem(item.product);
-                toggleSaveForLater(item.productId);
+                toggleSaveForLater(item.productId, item.size, item.color);
               }}>
                 Move to Cart
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => toggleSaveForLater(item.productId)}>
+              <Button size="sm" variant="ghost" onClick={() => toggleSaveForLater(item.productId, item.size, item.color)}>
                 Remove
               </Button>
             </div>

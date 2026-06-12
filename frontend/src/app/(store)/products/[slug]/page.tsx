@@ -33,8 +33,8 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
-  const availableSizes = [...new Set(product?.variants?.map((v: any) => v.size).filter(Boolean) || [])] as string[];
-  const availableColors = [...new Set(product?.variants?.map((v: any) => v.color).filter(Boolean) || [])] as string[];
+  const availableSizes = Array.from(new Set(product?.variants?.map((v: any) => v.size).filter(Boolean) || [])) as string[];
+  const availableColors = Array.from(new Set(product?.variants?.map((v: any) => v.color).filter(Boolean) || [])) as string[];
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -173,7 +173,7 @@ export default function ProductDetailPage() {
             <div className="space-y-6">
               <ReviewForm productId={product.id} />
               <div className="space-y-4">
-                {product.reviews?.map((review) => (
+                {product.reviews?.map((review: any) => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
                 {(!product.reviews || product.reviews.length === 0) && (

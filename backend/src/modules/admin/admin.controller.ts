@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -21,6 +21,11 @@ export class AdminController {
     return this.adminService.getCustomers(query.page, query.limit, query.search);
   }
 
+  @Get('customers/:id')
+  async getCustomer(@Param('id') id: string) {
+    return this.adminService.getCustomer(id);
+  }
+
   @Get('analytics')
   async getAnalytics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     return this.adminService.getAnalytics(startDate, endDate);
@@ -29,5 +34,10 @@ export class AdminController {
   @Get('settings')
   async getSettings() {
     return { storeName: 'Tolumak', currency: 'NGN', email: 'hello@tolumak.com', phone: '+2348000000000', address: 'Lagos, Nigeria' };
+  }
+
+  @Patch('settings')
+  async updateSettings(@Body() settings: Record<string, unknown>) {
+    return { ...settings };
   }
 }

@@ -71,16 +71,16 @@ export const useAuthStore = create<AuthState>()(
 
       getMe: async () => {
         try {
-          const res = await authApi.getMe() as { success: boolean; data: User };
-          set({ user: res.data, isAuthenticated: true });
+          const res = await authApi.getMe() as User | { data: User };
+          set({ user: "data" in res ? res.data : res, isAuthenticated: true });
         } catch {
           set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
         }
       },
 
       updateProfile: async (data: FormData | Record<string, unknown>) => {
-        const res = await authApi.updateProfile(data) as { success: boolean; data: User };
-        set({ user: res.data });
+        const res = await authApi.updateProfile(data) as User | { data: User };
+        set({ user: "data" in res ? res.data : res });
       },
 
       setUser: (user: User) => set({ user }),
