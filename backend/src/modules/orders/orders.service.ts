@@ -177,7 +177,7 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: { select: { id: true, slug: true, name: true, images: { orderBy: { order: 'asc' } } } },
+            product: { select: { id: true, slug: true, name: true, images: { take: 5, orderBy: { order: 'asc' } } } },
           },
         },
         payment: true,

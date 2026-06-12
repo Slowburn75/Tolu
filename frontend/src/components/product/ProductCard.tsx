@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingBag, Star } from "lucide-react";
@@ -21,6 +22,9 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
   const discount = product.discountPrice ? calculateDiscount(product.price, product.discountPrice) : 0;
+  const [imgError, setImgError] = useState(false);
+  const [imgError2, setImgError2] = useState(false);
+  const imgSrc = imgError ? "/placeholder.svg" : (product.images?.[0]?.url || product.images?.[0] || "/placeholder.svg");
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,19 +49,21 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
     <Link href={`/products/${product.slug}`} className="group block">
       <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden mb-3">
         <Image
-          src={product.images?.[0]?.url || product.images?.[0] || "/placeholder.png"}
+          src={imgSrc}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          onError={() => setImgError(true)}
         />
-        {product.images?.[1]?.url && (
+        {!imgError && product.images?.[1]?.url && (
           <Image
-            src={product.images[1].url}
+            src={imgError2 ? "/placeholder.svg" : product.images[1].url}
             alt={product.name}
             fill
             className="object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            onError={() => setImgError2(true)}
           />
         )}
 

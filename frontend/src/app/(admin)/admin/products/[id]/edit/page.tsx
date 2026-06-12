@@ -37,7 +37,7 @@ export default function EditProductPage() {
     try {
       const imageUrls: { url: string; order: number; alt: string }[] = [];
       const name = formData.get("name") as string;
-      imageUrls.push({ url: `https://placehold.co/800x800/EEE/31343C?text=${encodeURIComponent(name || 'Product')}`, order: 0, alt: name });
+      imageUrls.push({ url: "/placeholder.svg", order: 0, alt: name });
 
       const sizes = JSON.parse((formData.get("sizes") as string) || "[]");
       const colors = JSON.parse((formData.get("colors") as string) || "[]");
