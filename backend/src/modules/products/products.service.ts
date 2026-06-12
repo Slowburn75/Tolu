@@ -278,7 +278,7 @@ export class ProductsService {
       where: { id },
       data: {
         ...data,
-        categories: dto.categoryIds ? { set: [], create: dto.categoryIds.map((catId) => ({ categoryId: catId })) } : undefined,
+        categories: dto.categoryIds ? { deleteMany: {}, create: dto.categoryIds.map((catId) => ({ categoryId: catId })) } : undefined,
         images: dto.images ? { deleteMany: {}, create: dto.images.map((img) => ({ url: img.url, publicId: img.publicId, alt: img.alt, order: img.order || 0 })) } : undefined,
         variants: dto.variants ? { deleteMany: {}, create: dto.variants.map((v) => ({ size: v.size, color: v.color, colorHex: v.colorHex, stock: v.stock || 0, price: v.price })) } : undefined,
       },
