@@ -23,8 +23,8 @@ export default function AdminOrderDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchOrder = () => {
-    adminApi.getOrder(params.id as string).then((res) => {
-      setOrder((res as { data: Order }).data);
+    adminApi.getOrder(params.id as string).then((res: any) => {
+      setOrder(res?.data || res as Order);
     }).catch(() => router.push("/admin/orders")).finally(() => setLoading(false));
   };
 

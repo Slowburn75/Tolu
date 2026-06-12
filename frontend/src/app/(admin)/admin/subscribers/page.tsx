@@ -16,7 +16,7 @@ export default function AdminSubscribersPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = () => { adminApi.getSubscribers().then((res) => setSubscribers((res as { data: Subscriber[] }).data || [])).finally(() => setLoading(false)); };
+  const fetch = () => { adminApi.getSubscribers().then((res: any) => setSubscribers(Array.isArray(res) ? res : res?.data || [])).finally(() => setLoading(false)); };
   useEffect(() => { fetch(); }, []);
 
   const handleDelete = async (id: string) => {

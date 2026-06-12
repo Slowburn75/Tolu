@@ -34,6 +34,12 @@ export class OrdersController {
     return this.ordersService.findById(id, userId);
   }
 
+  @Post('orders/:id/cancel')
+  @UseGuards(JwtAuthGuard)
+  async cancelOrder(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.ordersService.cancelOrder(userId, id);
+  }
+
   @Patch('admin/orders/:id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

@@ -20,7 +20,7 @@ export default function AdminCategoriesPage() {
 
   const fetch = () => {
     setLoading(true);
-    adminApi.getCategories().then((res) => setCategories((res as { data: Category[] }).data || [])).finally(() => setLoading(false));
+    adminApi.getCategories().then((res: any) => setCategories(Array.isArray(res) ? res : res?.data || [])).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetch(); }, []);

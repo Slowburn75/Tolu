@@ -25,7 +25,7 @@ export default function AdminCustomerDetailPage() {
       adminApi.getCustomer(customerId),
       adminApi.getOrders({ userId: customerId }),
     ]).then(([customerRes, ordersRes]) => {
-      setCustomer((customerRes as { data: User }).data);
+      setCustomer((customerRes as any)?.data || customerRes as User);
       setOrders((ordersRes as { data: Order[] }).data || []);
     }).catch(() => router.push("/admin/customers")).finally(() => setLoading(false));
   }, [customerId]);

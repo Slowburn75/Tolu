@@ -19,7 +19,7 @@ export default function AdminCouponsPage() {
   const [editing, setEditing] = useState<Coupon | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const fetch = () => { adminApi.getCoupons().then((res) => setCoupons((res as { data: Coupon[] }).data || [])); };
+  const fetch = () => { adminApi.getCoupons().then((res: any) => setCoupons(Array.isArray(res) ? res : res?.data || [])); };
   useEffect(() => { fetch(); }, []);
 
   const handleSubmit = async (data: Record<string, unknown>) => {

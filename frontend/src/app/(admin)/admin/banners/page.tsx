@@ -20,7 +20,7 @@ export default function AdminBannersPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({ title: "", subtitle: "", image: "", link: "", order: 1, isActive: true });
 
-  const fetch = () => { adminApi.getBanners().then((res) => setBanners((res as { data: Banner[] }).data || [])); };
+  const fetch = () => { adminApi.getBanners().then((res: any) => setBanners(Array.isArray(res) ? res : res?.data || [])); };
   useEffect(() => { fetch(); }, []);
 
   const handleSubmit = async () => {

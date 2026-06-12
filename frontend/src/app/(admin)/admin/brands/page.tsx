@@ -19,7 +19,7 @@ export default function AdminBrandsPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", description: "" });
 
-  const fetch = () => { adminApi.getBrands().then((res) => setBrands((res as { data: Brand[] }).data || [])); };
+  const fetch = () => { adminApi.getBrands().then((res: any) => setBrands(Array.isArray(res) ? res : res?.data || [])); };
   useEffect(() => { fetch(); }, []);
 
   const handleSubmit = async () => {

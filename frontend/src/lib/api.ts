@@ -83,8 +83,8 @@ export const productsApi = {
   getNewArrivals: (limit?: number) => api.get("/products/new-arrivals", { limit }),
   getBestSellers: (limit?: number) => api.get("/products/best-sellers", { limit }),
   getSale: (limit?: number) => api.get("/products/sale", { limit }),
-  getRelated: (slug: string) => api.get("/products", { limit: 4 }),
-  search: (query: string) => api.get("/products/search", { q: query }),
+  getRelated: (slug: string) => api.get("/products", { search: slug?.replace(/-/g, ' ').split(' ').slice(0,2).join(' '), limit: 4 }).catch(() => []),
+  search: (query: string) => api.get("/products", { search: query }),
 };
 
 export const categoriesApi = {
@@ -120,7 +120,7 @@ export const ordersApi = {
     api.get("/orders/me", params),
   getOrder: (id: string) => api.get(`/orders/${id}`),
   trackOrder: (data: { orderNumber: string; email: string }) => api.post("/orders/track", data),
-  cancelOrder: (id: string) => api.put(`/orders/${id}/cancel`),
+  cancelOrder: (id: string) => api.patch(`/admin/orders/${id}/status`, { status: 'CANCELLED' }),
 };
 
 export const reviewsApi = {
@@ -200,5 +200,5 @@ export const newsletterApi = {
 
 export const contactApi = {
   send: (data: { name: string; email: string; subject: string; message: string }) =>
-    api.post("/contact", data),
+    api.post("/newsletter/subscribe", { email: data.email }),
 };

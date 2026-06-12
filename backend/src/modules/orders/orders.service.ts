@@ -287,6 +287,21 @@ export class OrdersService {
     return updated;
   }
 
+  async cancelOrder(userId: string, orderId: string) {
+    const order = await this.prisma.order.findFirst({
+      where: { id: orderId, userId },
+    });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.status !== 'PENDING' && order.status !== 'PAID') {
+      throw new BadRequestException('Order cannot be cancelled at this stage');
+    }
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'CANCELLED' as OrderStatus },
+      include: { items: true },
+    });
+  }
+
   async updateTracking(id: string, dto: UpdateTrackingDto) {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) throw new NotFoundException('Order not found');

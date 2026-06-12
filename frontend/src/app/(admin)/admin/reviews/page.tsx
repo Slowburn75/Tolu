@@ -17,7 +17,7 @@ export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = () => { adminApi.getReviews().then((res) => setReviews((res as { data: Review[] }).data || [])).finally(() => setLoading(false)); };
+  const fetch = () => { adminApi.getReviews().then((res: any) => setReviews(Array.isArray(res) ? res : res?.data || [])).finally(() => setLoading(false)); };
   useEffect(() => { fetch(); }, []);
 
   const handleApprove = async (id: string) => {
