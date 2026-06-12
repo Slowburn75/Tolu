@@ -1,23 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null = null;
+  private readonly logger = new Logger(EmailService.name);
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.EMAIL_PORT || '587', 10),
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER || '',
-        pass: process.env.EMAIL_PASS || '',
-      },
-    });
+    const user = process.env.EMAIL_USER || '';
+    const pass = process.env.EMAIL_PASS || '';
+    if (user && pass && user !== 'your-email@gmail.com') {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.EMAIL_PORT || '587', 10),
+        secure: false,
+        auth: { user, pass },
+      });
+    } else {
+      this.logger.warn('Email not configured — skipping email sending');
+    }
   }
 
   async sendMail(to: string, subject: string, html: string): Promise<void> {
+    if (!this.transporter) {
+      this.logger.log(`[EMAIL] Would send to ${to}: ${subject}`);
+      return;
+    }
     const from = process.env.EMAIL_USER || 'noreply@tolumak.com';
     await this.transporter.sendMail({ from, to, subject, html });
   }
