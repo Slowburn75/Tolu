@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
     { accessorKey: "name", header: "Product", cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-muted rounded-md overflow-hidden shrink-0">
-          <img src={row.original.images?.[0]?.url || "/placeholder.png"} alt="" className="w-full h-full object-cover" />
+          <img src={row.original.images?.[0]?.url || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
         </div>
         <span className="font-medium">{row.original.name}</span>
       </div>

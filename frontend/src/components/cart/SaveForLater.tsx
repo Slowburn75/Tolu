@@ -18,7 +18,7 @@ export function SaveForLater() {
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 bg-muted rounded-md overflow-hidden">
                 <img
-                  src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.png"}
+                  src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.svg"}
                   alt={item.product.name}
                   className="w-full h-full object-cover"
                 />

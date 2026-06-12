@@ -26,7 +26,7 @@ export function OrderSummary({ items, subtotal, shipping, discount, total, onPla
           <div key={item.id} className="flex gap-3">
             <div className="relative w-14 h-14 bg-muted rounded-md overflow-hidden shrink-0">
               <Image
-                src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.png"}
+                src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.svg"}
                 alt={item.product.name}
                 fill
                 className="object-cover"

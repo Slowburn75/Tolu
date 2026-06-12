@@ -16,10 +16,10 @@ export function WishlistButton({ isInWishlist, onClick, size = "default" }: Wish
       variant={isInWishlist ? "default" : "outline"}
       size={size}
       onClick={onClick}
-      className={cn("gap-2", isInWishlist && "bg-red-500 hover:bg-red-600 border-red-500")}
+      className={cn("gap-2", isInWishlist && "bg-primary text-primary-foreground")}
     >
-      <Heart className={cn("h-4 w-4", isInWishlist && "fill-white")} />
-      {isInWishlist ? "Saved" : "Save to Wishlist"}
+      <Heart className={cn("h-5 w-5", isInWishlist && "fill-primary-foreground")} />
+      <span className={size === "icon" ? "sr-only" : ""}>{isInWishlist ? "Saved" : "Save to Wishlist"}</span>
     </Button>
   );
 }

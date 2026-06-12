@@ -20,7 +20,7 @@ export function CartItem({ item }: CartItemProps) {
     <div className="flex gap-4 py-4 border-b">
       <div className="relative w-24 h-24 bg-muted rounded-md overflow-hidden shrink-0">
         <Image
-          src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.png"}
+          src={item.product.images?.[0]?.url || item.product.images?.[0] || "/placeholder.svg"}
           alt={item.product.name}
           fill
           className="object-cover"

@@ -95,7 +95,7 @@ export default function AdminOrderDetailPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 border rounded-lg p-4">
                     <div className="w-16 h-16 bg-muted rounded-md overflow-hidden shrink-0">
-                      <img src={item.product?.images?.[0]?.url || item.product?.images?.[0] || "/placeholder.png"} alt="" className="w-full h-full object-cover" />
+                      <img src={item.product?.images?.[0]?.url || item.product?.images?.[0] || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{item.product?.name || item.name}</p>

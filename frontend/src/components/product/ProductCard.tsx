@@ -25,6 +25,7 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
   const [imgError, setImgError] = useState(false);
   const [imgError2, setImgError2] = useState(false);
   const imgSrc = imgError ? "/placeholder.svg" : (product.images?.[0]?.url || product.images?.[0] || "/placeholder.svg");
+  const fallbackSrc = "/placeholder.svg";
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
