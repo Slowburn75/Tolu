@@ -29,7 +29,7 @@ export function CustomerReviews() {
                 <div className="border rounded-xl p-6 h-full">
                   <div className="flex items-center gap-2 mb-4">
                     {Array.from({ length: 5 }).map((_, j) => (
-                      <Star key={j} className={`h-4 w-4 ${j < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
+                      <Star key={j} className={`h-4 w-4 ${j < review.rating ? "fill-foreground text-foreground" : "text-muted-foreground"}`} />
                     ))}
                   </div>
                   <p className="text-muted-foreground mb-6">&ldquo;{review.text}&rdquo;</p>

@@ -37,7 +37,7 @@ export default function AdminReviewsPage() {
         <span className="text-sm">{row.original.user?.name || "Anonymous"}</span>
       </div>
     )},
-    { header: "Rating", cell: ({ row }) => <div className="flex items-center gap-1">{Array.from({ length: row.original.rating }).map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}</div> },
+    { header: "Rating", cell: ({ row }) => <div className="flex items-center gap-1">{Array.from({ length: row.original.rating }).map((_, i) => <Star key={i} className="h-3 w-3 fill-foreground text-foreground" />)}</div> },
     { header: "Comment", cell: ({ row }) => <p className="max-w-xs truncate text-sm">{row.original.comment}</p> },
     { header: "Status", cell: ({ row }) => row.original.isApproved ? <Badge variant="success">Approved</Badge> : <Badge variant="warning">Pending</Badge> },
     { header: "Date", cell: ({ row }) => formatDate(row.original.createdAt) },

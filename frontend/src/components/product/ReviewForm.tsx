@@ -62,7 +62,7 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
               <Star
                 className={cn(
                   "h-6 w-6 transition-all",
-                  (hover || rating) > i ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                  (hover || rating) > i ? "fill-foreground text-foreground" : "text-muted-foreground"
                 )}
               />
             </button>

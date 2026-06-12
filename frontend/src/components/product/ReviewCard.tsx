@@ -34,7 +34,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               className={cn(
                 "h-4 w-4",
                 i < review.rating
-                  ? "fill-yellow-400 text-yellow-400"
+                  ? "fill-foreground text-foreground"
                   : "text-gray-300"
               )}
             />

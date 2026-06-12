@@ -62,7 +62,7 @@ export function HeroBanner() {
   const slide = slides[current];
 
   return (
-    <section className="relative h-[60vh] min-h-[400px] lg:h-[80vh] overflow-hidden bg-brand-black">
+    <section className="relative h-[60vh] min-h-[400px] lg:h-[80vh] overflow-hidden bg-black">
       {slides.map((s, i) => (
         <div
           key={i}

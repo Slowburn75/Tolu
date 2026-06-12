@@ -99,7 +99,7 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
         </h3>
         <div className="flex items-center gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className={cn("h-3 w-3", i < Math.round(product.averageRating || product.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300")} />
+            <Star key={i} className={cn("h-3 w-3", i < Math.round(product.averageRating || product.rating || 0) ? "fill-foreground text-foreground" : "text-muted-foreground")} />
           ))}
           <span className="text-xs text-muted-foreground ml-1">({product.reviewCount || product._count?.reviews || 0})</span>
         </div>
