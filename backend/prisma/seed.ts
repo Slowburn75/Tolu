@@ -527,9 +527,9 @@ async function main() {
           },
           images: {
             create: [
-              { url: `https://placehold.co/800x800/EEE/31343C?text=${encodeURIComponent(p.name)}`, order: 0, alt: p.name },
-              { url: `https://placehold.co/800x800/DDD/31343C?text=${encodeURIComponent(p.name)}+2`, order: 1 },
-              { url: `https://placehold.co/800x800/CCC/31343C?text=${encodeURIComponent(p.name)}+3`, order: 2 },
+              { url: `/placeholder.svg`, order: 0, alt: p.name },
+              { url: `/placeholder.svg`, order: 1 },
+              { url: `/placeholder.svg`, order: 2 },
             ],
           },
           variants: {

@@ -1,12 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ProductGalleryProps {
   images: string[];
   productName: string;
+}
+
+function GalleryImage({ src, alt, className, sizes }: { src: string; alt: string; className?: string; sizes?: string }) {
+  const [failed, setFailed] = useState(false);
+  const isExternal = src.includes("placehold.co") || src.startsWith("http");
+  if (!src || (isExternal && failed)) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-muted">
+        <svg width="60" height="60" viewBox="0 0 800 800" fill="none" className="opacity-20 text-muted-foreground">
+          <rect x="300" y="300" width="200" height="200" rx="8" fill="currentColor"/>
+          <path d="M350 450L400 380L450 450H350Z" fill="currentColor"/>
+          <circle cx="370" cy="350" r="20" fill="currentColor"/>
+        </svg>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
@@ -38,21 +61,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         onMouseLeave={() => setIsZoomed(false)}
         onMouseMove={handleMouseMove}
       >
-        <Image
+        <GalleryImage
           src={images[selectedIndex]}
           alt={productName}
-          fill
           className={cn(
-            "object-cover transition-transform duration-200",
+            "w-full h-full object-cover transition-transform duration-200",
             isZoomed && "scale-150"
           )}
-          style={
-            isZoomed
-              ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` }
-              : undefined
-          }
-          sizes="(max-width: 768px) 100vw, 50vw"
-          priority
         />
       </div>
 
@@ -69,12 +84,10 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               )}
               onClick={() => setSelectedIndex(index)}
             >
-              <Image
+              <GalleryImage
                 src={image}
                 alt={`${productName} ${index + 1}`}
-                fill
-                className="object-cover"
-                sizes="80px"
+                className="w-full h-full object-cover"
               />
             </button>
           ))}
