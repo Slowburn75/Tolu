@@ -26,10 +26,15 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
       toast.error("Please select a rating");
       return;
     }
+    const token = typeof window !== "undefined" ? localStorage.getItem("tolumak-auth") : null;
+    if (!token) {
+      toast.error("Please login to submit a review");
+      return;
+    }
     setLoading(true);
     try {
       await reviewsApi.createReview({ productId, rating, comment });
-      toast.success("Review submitted!");
+      toast.success("Review submitted! It will appear after approval.");
       setRating(0);
       setComment("");
       onSuccess?.();

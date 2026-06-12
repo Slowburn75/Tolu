@@ -126,7 +126,7 @@ export const ordersApi = {
 export const reviewsApi = {
   getProductReviews: (productId: string, params?: Record<string, string | number | boolean | undefined>) =>
     api.get(`/reviews/product/${productId}`, params),
-  createReview: (data: { productId: string; rating: number; comment: string; images?: string[] }) =>
+  createReview: (data: { productId: string; rating: number; comment: string }) =>
     api.post("/reviews", data),
 };
 
