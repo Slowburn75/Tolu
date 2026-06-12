@@ -38,8 +38,8 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
       setRating(0);
       setComment("");
       onSuccess?.();
-    } catch {
-      toast.error("Failed to submit review");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to submit review");
     } finally {
       setLoading(false);
     }

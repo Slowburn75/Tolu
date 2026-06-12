@@ -18,7 +18,7 @@ interface ProductCardProps {
 
 function SafeImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
-  if (!src || src.includes("placehold.co") || failed) {
+  if (!src || failed) {
     return (
       <div className="absolute inset-0 flex items-center justify-center bg-muted">
         <svg width="60" height="60" viewBox="0 0 800 800" fill="none" className="opacity-20 text-muted-foreground">

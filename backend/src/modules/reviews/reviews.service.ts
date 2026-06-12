@@ -37,17 +37,6 @@ export class ReviewsService {
     const product = await this.prisma.product.findUnique({ where: { id: dto.productId } });
     if (!product) throw new NotFoundException('Product not found');
 
-    const hasPurchased = await this.prisma.orderItem.findFirst({
-      where: {
-        productId: dto.productId,
-        order: { userId, status: { in: ['DELIVERED', 'PAID', 'PROCESSING', 'SHIPPED'] } },
-      },
-    });
-
-    if (!hasPurchased) {
-      throw new BadRequestException('You can only review products you have purchased');
-    }
-
     const existingReview = await this.prisma.review.findFirst({
       where: { userId, productId: dto.productId },
     });

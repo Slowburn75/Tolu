@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { useRouter } from "next/navigation";
-import { adminApi, categoriesApi, brandsApi } from "@/lib/api";
+import { adminApi, categoriesApi, brandsApi, uploadsApi } from "@/lib/api";
 import toast from "react-hot-toast";
 
 export default function NewProductPage() {
@@ -25,9 +25,21 @@ export default function NewProductPage() {
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      const imageUrls: { url: string; order: number; alt: string }[] = [];
       const name = formData.get("name") as string;
-      imageUrls.push({ url: "/placeholder.svg", order: 0, alt: name });
+      const files = formData.getAll("images").filter((file): file is File => file instanceof File && file.size > 0);
+      let imageUrls: { url: string; publicId?: string; order: number; alt: string }[] | undefined;
+
+      if (files.length > 0) {
+        const uploadData = new FormData();
+        files.forEach((file) => uploadData.append("files", file));
+        const uploadRes = await uploadsApi.uploadImages(uploadData) as { images?: { url: string; publicId?: string }[] };
+        imageUrls = uploadRes.images?.map((image, order) => ({
+          url: image.url,
+          publicId: image.publicId,
+          order,
+          alt: name,
+        }));
+      }
 
       const sizes = JSON.parse((formData.get("sizes") as string) || "[]");
       const colors = JSON.parse((formData.get("colors") as string) || "[]");
@@ -56,7 +68,7 @@ export default function NewProductPage() {
         isNewArrival: formData.get("isNewArrival") === "true",
         isBestSeller: formData.get("isBestSeller") === "true",
         isSale: formData.get("isSale") === "true",
-        images: imageUrls.length > 0 ? imageUrls : undefined,
+        images: imageUrls,
         variants: variants.length > 0 ? variants : undefined,
       };
 
