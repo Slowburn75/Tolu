@@ -21,6 +21,8 @@ export const useWishlistStore = create<WishlistState>()(
       isLoading: false,
 
       fetchWishlist: async () => {
+        const token = typeof window !== "undefined" ? localStorage.getItem("tolumak-auth") : null;
+        if (!token) return;
         set({ isLoading: true });
         try {
           const res = await wishlistApi.getWishlist() as { data?: { items?: { id: string; product: Product }[] }; items?: { id: string; product: Product }[] };
@@ -36,11 +38,12 @@ export const useWishlistStore = create<WishlistState>()(
       addItem: async (product: Product) => {
         set((state) => ({ items: [...state.items, product] }));
         try {
-          await wishlistApi.addToWishlist(product.id);
-          await get().fetchWishlist();
-        } catch {
-          set((state) => ({ items: state.items.filter((i) => i.id !== product.id) }));
-        }
+          const token = typeof window !== "undefined" ? localStorage.getItem("tolumak-auth") : null;
+          if (token) {
+            await wishlistApi.addToWishlist(product.id);
+            await get().fetchWishlist();
+          }
+        } catch {}
       },
 
       removeItem: async (productId: string) => {
@@ -48,10 +51,11 @@ export const useWishlistStore = create<WishlistState>()(
         const item = prev.find((i) => i.id === productId);
         set((state) => ({ items: state.items.filter((i) => i.id !== productId) }));
         try {
-          await wishlistApi.removeFromWishlist(item?.wishlistItemId || productId);
-        } catch {
-          set({ items: prev });
-        }
+          const token = typeof window !== "undefined" ? localStorage.getItem("tolumak-auth") : null;
+          if (token && item?.wishlistItemId) {
+            await wishlistApi.removeFromWishlist(item.wishlistItemId);
+          }
+        } catch {}
       },
 
       isInWishlist: (productId: string) => get().items.some((i) => i.id === productId),
