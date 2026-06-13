@@ -5,14 +5,14 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --include=dev
 
 COPY prisma ./prisma
 RUN npx prisma generate
 
 COPY . .
 
-RUN npm run build
+RUN npx tsc -p tsconfig.json && ls dist/ && ls dist/main*
 
 EXPOSE 10000
 
