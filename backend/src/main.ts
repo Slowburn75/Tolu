@@ -16,6 +16,8 @@ async function bootstrap() {
     origin: function (origin, callback) {
       const allowedOrigins = [
         process.env.FRONTEND_URL,
+        ...(process.env.FRONTEND_URLS || '').split(',').map((url) => url.trim()).filter(Boolean),
+        'https://tolumaks.vercel.app',
         'http://localhost:3000',
         'http://localhost:3001',
       ].filter(Boolean);
