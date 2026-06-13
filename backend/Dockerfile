@@ -12,7 +12,7 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN npx tsc -p tsconfig.json; ls -laR dist/ | head -80; find dist -name "main*"; mkdir -p /out; cp -r dist/* /out/; echo "=== /out ==="; ls -laR /out/ | head -80; true
+RUN npx tsc -p tsconfig.json; echo "BUILD DONE"; ls -la dist/*.js 2>/dev/null || echo "NO JS FILES IN dist/"; ls -la dist/*.d.ts 2>/dev/null; echo "---"; wc -c dist/main.js 2>/dev/null || echo "main.js MISSING"; cat dist/main.js 2>/dev/null | head -5 || echo "CANNOT READ main.js"; echo "---END---"; mkdir -p /out; cp -r dist/* /out/ 2>/dev/null; ls -la /out/*.js 2>/dev/null || echo "NO JS IN /out"
 
 EXPOSE 10000
 
