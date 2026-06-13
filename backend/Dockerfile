@@ -12,7 +12,7 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN npx tsc -p tsconfig.json
+RUN npx tsc -p tsconfig.json && ls dist/
 
 EXPOSE 10000
 
