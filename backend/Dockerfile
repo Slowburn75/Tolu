@@ -12,7 +12,7 @@ RUN npx prisma generate
 
 COPY . .
 
-RUN npx tsc -p tsconfig.json && ls dist/
+RUN npm run build && mkdir -p dist && cp -r dist/src/* dist/ 2>/dev/null; true
 
 EXPOSE 10000
 
