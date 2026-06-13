@@ -11,7 +11,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 COPY . .
-RUN npx tsc -p tsconfig.json
+RUN npm run build
 
 EXPOSE 10000
 
