@@ -12,8 +12,6 @@
     "rootDir": "./src",
     "incremental": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "strict": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
