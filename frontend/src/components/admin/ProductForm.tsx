@@ -158,14 +158,14 @@ export function ProductForm({ defaultValues, categories = [], brands = [], onSub
               <input
                 type="file"
                 name="video"
-                accept="video/mp4,video/quicktime,video/webm"
+                accept="video/mp4,video/quicktime,video/webm,video/x-msvideo,video/avi,video/mov"
                 className="text-sm w-full"
                 onChange={(e) => {
                   const file = e.target.files?.[0] || null;
                   setVideoFile(file);
                 }}
               />
-              <p className="text-xs text-muted-foreground">Supports MP4, MOV, WebM. Max 100MB.</p>
+              <p className="text-xs text-muted-foreground">Supports MP4, MOV, WebM, and AVI. Max 100MB.</p>
             </CardContent>
           </Card>
         </div>

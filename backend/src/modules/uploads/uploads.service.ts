@@ -23,7 +23,7 @@ export class UploadsService {
     }
   }
 
-  private async uploadFromBuffer(file: Express.Multer.File): Promise<any> {
+  private async uploadImageFromBuffer(file: Express.Multer.File): Promise<UploadApiResponse> {
     if (!this.cloudinaryConfigured) {
       return {
         secure_url: `https://placehold.co/800x800/EEE/31343C?text=${encodeURIComponent(file.originalname || 'image')}`,
@@ -32,16 +32,19 @@ export class UploadsService {
         height: 800,
         format: 'png',
         bytes: 0,
-      };
+      } as UploadApiResponse;
     }
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
 
-    return cloudinary.uploader.upload(dataURI, {
-      folder: 'tolumak',
-      resource_type: 'auto',
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
-    });
+    try {
+      return await this.uploadStream(file, {
+        folder: 'tolumak',
+        resource_type: 'image',
+        transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      });
+    } catch (error) {
+      const message = this.getUploadErrorMessage(error, 'Image upload failed');
+      throw new BadRequestException(`Image upload failed: ${message}`);
+    }
   }
 
   private uploadStream(file: Express.Multer.File, options: UploadApiOptions): Promise<UploadApiResponse> {
@@ -69,16 +72,16 @@ export class UploadsService {
   async uploadImage(file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No file provided');
 
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
     if (!allowedMimes.includes(file.mimetype)) {
-      throw new BadRequestException('Invalid file type. Only JPEG, PNG, WebP, and GIF allowed');
+      throw new BadRequestException('Invalid file type. Only JPEG, PNG, WebP, GIF, and AVIF allowed');
     }
 
     if (file.size > 5 * 1024 * 1024) {
       throw new BadRequestException('File too large. Maximum size is 5MB');
     }
 
-    const result = await this.uploadFromBuffer(file);
+    const result = await this.uploadImageFromBuffer(file);
 
     return {
       url: result.secure_url,
@@ -101,7 +104,7 @@ export class UploadsService {
   async uploadVideo(file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No file provided');
 
-    const allowedMimes = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo'];
+    const allowedMimes = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo', 'video/avi', 'video/mov'];
     if (!allowedMimes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid file type. Only MP4, MOV, WebM, and AVI allowed');
     }
