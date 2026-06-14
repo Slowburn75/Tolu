@@ -68,6 +68,42 @@ export class UploadsService {
     return { images: results };
   }
 
+  async uploadVideo(file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file provided');
+
+    const allowedMimes = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo'];
+    if (!allowedMimes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type. Only MP4, MOV, WebM, and AVI allowed');
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      throw new BadRequestException('File too large. Maximum size is 100MB');
+    }
+
+    if (!this.cloudinaryConfigured) {
+      return {
+        url: `/placeholder.svg`,
+        publicId: `placeholder-${Date.now()}`,
+      };
+    }
+
+    const b64 = Buffer.from(file.buffer).toString('base64');
+    const dataURI = `data:${file.mimetype};base64,${b64}`;
+
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'tolumak',
+      resource_type: 'video',
+    });
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      format: result.format,
+      size: result.bytes,
+      duration: result.duration,
+    };
+  }
+
   async deleteImage(publicId: string) {
     try {
       const result = await cloudinary.uploader.destroy(publicId);

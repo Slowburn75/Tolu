@@ -25,4 +25,11 @@ export class UploadsController {
   async deleteImage(@Param('publicId') publicId: string) {
     return this.uploadsService.deleteImage(publicId);
   }
+
+  @Post('video')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadVideo(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('No file uploaded');
+    return this.uploadsService.uploadVideo(file);
+  }
 }

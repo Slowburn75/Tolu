@@ -259,7 +259,7 @@ export class ProductsService {
       if (existingSku) throw new ConflictException('SKU already exists');
     }
 
-    const scalarFields = ['name', 'description', 'sku', 'price', 'discountPrice', 'stockQuantity', 'material', 'weight', 'careInstructions', 'status', 'isFeatured', 'isNewArrival', 'isBestSeller', 'isSale', 'gender', 'ageGroup', 'brandId'] as const;
+    const scalarFields = ['name', 'description', 'sku', 'price', 'discountPrice', 'stockQuantity', 'material', 'weight', 'careInstructions', 'video', 'status', 'isFeatured', 'isNewArrival', 'isBestSeller', 'isSale', 'gender', 'ageGroup', 'brandId'] as const;
     const data: Record<string, any> = {};
     for (const field of scalarFields) {
       if (dto[field] !== undefined) {

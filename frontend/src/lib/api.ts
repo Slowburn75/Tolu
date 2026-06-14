@@ -148,6 +148,7 @@ export const addressesApi = {
 export const uploadsApi = {
   uploadImage: (data: FormData) => api.post("/uploads/image", data),
   uploadImages: (data: FormData) => api.post("/uploads/images", data),
+  uploadVideo: (data: FormData) => api.post("/uploads/video", data),
   deleteImage: (publicId: string) => api.delete(`/uploads/image/${publicId}`),
 };
 

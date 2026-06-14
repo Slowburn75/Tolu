@@ -111,6 +111,7 @@ model Product {
   material      String?
   weight        Decimal?      @db.Decimal(8, 2)
   careInstructions String?
+  video          String?
   status        ProductStatus @default(ACTIVE)
   isFeatured    Boolean       @default(false)
   isNewArrival  Boolean       @default(false)

@@ -27,7 +27,9 @@ export default function NewProductPage() {
     try {
       const name = formData.get("name") as string;
       const files = formData.getAll("images").filter((file): file is File => file instanceof File && file.size > 0);
+      const videoFile = (formData.get("video") as File | null);
       let imageUrls: { url: string; publicId?: string; order: number; alt: string }[] | undefined;
+      let videoUrl: string | undefined;
 
       if (files.length > 0) {
         const uploadData = new FormData();
@@ -39,6 +41,13 @@ export default function NewProductPage() {
           order,
           alt: name,
         }));
+      }
+
+      if (videoFile && videoFile.size > 0) {
+        const videoData = new FormData();
+        videoData.append("file", videoFile);
+        const videoRes = await uploadsApi.uploadVideo(videoData) as { url: string };
+        videoUrl = videoRes.url;
       }
 
       const sizes = JSON.parse((formData.get("sizes") as string) || "[]");
@@ -60,6 +69,7 @@ export default function NewProductPage() {
         material: formData.get("material") || undefined,
         weight: formData.get("weight") ? parseFloat(formData.get("weight") as string) : undefined,
         careInstructions: formData.get("careInstructions") || undefined,
+        video: videoUrl || undefined,
         gender: (formData.get("gender") as string)?.toUpperCase() || undefined,
         ageGroup: (formData.get("ageGroup") as string)?.toUpperCase() || undefined,
         brandId: formData.get("brandId") || undefined,

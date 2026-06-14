@@ -81,6 +81,10 @@ export class CreateProductDto {
   careInstructions?: string;
 
   @IsOptional()
+  @IsString()
+  video?: string;
+
+  @IsOptional()
   @IsEnum(ProductStatus)
   status?: ProductStatus;
 
@@ -169,6 +173,10 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   careInstructions?: string;
+
+  @IsOptional()
+  @IsString()
+  video?: string;
 
   @IsOptional()
   @IsEnum(ProductStatus)

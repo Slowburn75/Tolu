@@ -111,6 +111,13 @@ export default function ProductDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           <ProductGallery images={product.images?.map((img: any) => img.url || img) || []} productName={product.name} />
+          {product.video && (
+            <div className="mt-4 rounded-lg overflow-hidden">
+              <video controls className="w-full rounded-lg" style={{ maxHeight: 400 }}>
+                <source src={product.video} type="video/mp4" />
+              </video>
+            </div>
+          )}
           <div className="space-y-6">
             <ProductInfo product={product} />
             <Separator />

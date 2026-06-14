@@ -52,6 +52,7 @@ export function ProductForm({ defaultValues, categories = [], brands = [], onSub
   });
 
   const [images, setImages] = useState<File[]>([]);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
@@ -73,6 +74,8 @@ export function ProductForm({ defaultValues, categories = [], brands = [], onSub
     });
     formData.append("sizes", JSON.stringify(selectedSizes));
     formData.append("colors", JSON.stringify(selectedColors));
+    images.forEach((img) => formData.append("images", img));
+    if (videoFile) formData.append("video", videoFile);
     images.forEach((img) => formData.append("images", img));
     await onSubmit(formData);
   };
@@ -146,6 +149,23 @@ export function ProductForm({ defaultValues, categories = [], brands = [], onSub
                   }} />
                 </label>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <h3 className="font-semibold">Video</h3>
+              <input
+                type="file"
+                name="video"
+                accept="video/mp4,video/quicktime,video/webm"
+                className="text-sm w-full"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setVideoFile(file);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">Supports MP4, MOV, WebM. Max 100MB.</p>
             </CardContent>
           </Card>
         </div>
