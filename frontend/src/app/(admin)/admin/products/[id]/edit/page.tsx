@@ -94,8 +94,8 @@ export default function EditProductPage() {
       await adminApi.updateProduct(params.id as string, payload);
       toast.success("Product updated!");
       router.push("/admin/products");
-    } catch {
-      toast.error("Failed to update product");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update product");
     }
   };
 

@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { UploadApiOptions, UploadApiResponse } from 'cloudinary';
 
 @Injectable()
 export class UploadsService {
@@ -33,6 +34,18 @@ export class UploadsService {
       folder: 'tolumak',
       resource_type: 'auto',
       transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    });
+  }
+
+  private uploadStream(file: Express.Multer.File, options: UploadApiOptions): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+        if (error) return reject(error);
+        if (!result) return reject(new Error('Upload failed'));
+        resolve(result);
+      });
+
+      stream.end(file.buffer);
     });
   }
 
@@ -87,13 +100,16 @@ export class UploadsService {
       };
     }
 
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'tolumak',
-      resource_type: 'video',
-    });
+    let result: UploadApiResponse;
+    try {
+      result = await this.uploadStream(file, {
+        folder: 'tolumak',
+        resource_type: 'video',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Video upload failed';
+      throw new BadRequestException(message);
+    }
 
     return {
       url: result.secure_url,

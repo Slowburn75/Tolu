@@ -85,8 +85,8 @@ export default function NewProductPage() {
       await adminApi.createProduct(payload);
       toast.success("Product created!");
       router.push("/admin/products");
-    } catch {
-      toast.error("Failed to create product");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to create product");
     }
   };
 
