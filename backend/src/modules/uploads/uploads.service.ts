@@ -10,7 +10,14 @@ export class UploadsService {
     const name = process.env.CLOUDINARY_CLOUD_NAME;
     const key = process.env.CLOUDINARY_API_KEY;
     const secret = process.env.CLOUDINARY_API_SECRET;
-    this.cloudinaryConfigured = !!(name && key && secret && name !== 'your-cloud-name');
+    this.cloudinaryConfigured = !!(
+      name &&
+      key &&
+      secret &&
+      name !== 'your-cloud-name' &&
+      key !== 'your-api-key' &&
+      secret !== 'your-api-secret'
+    );
     if (this.cloudinaryConfigured) {
       cloudinary.config({ cloud_name: name, api_key: key, api_secret: secret });
     }
@@ -47,6 +54,16 @@ export class UploadsService {
 
       stream.end(file.buffer);
     });
+  }
+
+  private getUploadErrorMessage(error: unknown, fallback: string) {
+    if (error instanceof Error && error.message) return error.message;
+    if (error && typeof error === 'object' && 'message' in error) {
+      const message = (error as { message?: unknown }).message;
+      if (typeof message === 'string' && message.trim()) return message;
+    }
+
+    return fallback;
   }
 
   async uploadImage(file: Express.Multer.File) {
@@ -107,8 +124,8 @@ export class UploadsService {
         resource_type: 'video',
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Video upload failed';
-      throw new BadRequestException(message);
+      const message = this.getUploadErrorMessage(error, 'Video upload failed');
+      throw new BadRequestException(`Video upload failed: ${message}`);
     }
 
     return {
