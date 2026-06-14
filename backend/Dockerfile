@@ -15,4 +15,4 @@ RUN npm run build
 
 EXPOSE 10000
 
-CMD npx prisma migrate deploy && npx prisma db seed && node dist/main.js
+CMD npx prisma migrate deploy && node bootstrap.js && node dist/main.js
