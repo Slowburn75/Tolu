@@ -35,6 +35,7 @@ export interface Product {
   stock: number;
   stockQuantity?: number;
   images: any[];
+  video?: string;
   thumbnail?: string;
   color?: string;
   sizes?: string[];

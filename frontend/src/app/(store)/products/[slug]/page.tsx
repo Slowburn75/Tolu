@@ -110,11 +110,11 @@ export default function ProductDetailPage() {
     <StoreLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          <ProductGallery images={product.images?.map((img: any) => img.url || img) || []} productName={product.name} />
+          <ProductGallery images={productImages} productName={product.name} />
           {product.video && (
             <div className="mt-4 rounded-lg overflow-hidden">
               <video controls className="w-full rounded-lg" style={{ maxHeight: 400 }}>
-                <source src={product.video} type="video/mp4" />
+                <source src={product.video} />
               </video>
             </div>
           )}
@@ -130,13 +130,13 @@ export default function ProductDetailPage() {
               <ColorSelector selectedColor={selectedColor} onSelect={setSelectedColor} />
             )}
 
-            <QuantitySelector value={quantity} onChange={setQuantity} max={product.stockQuantity || 0} />
+            <QuantitySelector value={quantity} onChange={setQuantity} max={availableStock} />
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button size="lg" className="flex-1 h-14 text-base" onClick={handleAddToCart} disabled={!product.stockQuantity}>
+              <Button size="lg" className="flex-1 h-14 text-base" onClick={handleAddToCart} disabled={availableStock <= 0}>
                 Add to Cart
               </Button>
-              <Button size="lg" variant="outline" className="flex-1 h-14 text-base" onClick={handleBuyNow} disabled={!product.stockQuantity}>
+              <Button size="lg" variant="outline" className="flex-1 h-14 text-base" onClick={handleBuyNow} disabled={availableStock <= 0}>
                 Buy Now
               </Button>
               <WishlistButton isInWishlist={isInWishlist(product.id)} onClick={handleWishlist} size="icon" />
@@ -193,6 +193,9 @@ export default function ProductDetailPage() {
 
         <RelatedProducts products={related} />
       </div>
-    </StoreLayout>
-  );
-}
+      </StoreLayout>
+    );
+  }
+
+  const productImages = (product.images?.map((img: any) => img.url || img).filter(Boolean) || []) as string[];
+  const availableStock = product.stockQuantity ?? product.stock ?? 0;

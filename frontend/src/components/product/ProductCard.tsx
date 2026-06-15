@@ -43,7 +43,8 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
   const { addItem } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
-  const discount = product.discountPrice ? calculateDiscount(product.price, product.discountPrice) : 0;
+  const hasDiscount = Number(product.discountPrice || 0) > 0 && Number(product.discountPrice) < Number(product.price);
+  const discount = hasDiscount ? calculateDiscount(product.price, product.discountPrice) : 0;
   const imgUrl = product.images?.[0]?.url || (typeof product.images?.[0] === "string" ? product.images[0] : "");
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -100,7 +101,7 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
           <span className="text-xs text-muted-foreground ml-1">({product.reviewCount || product._count?.reviews || 0})</span>
         </div>
         <div className="flex items-center gap-2">
-          {product.discountPrice ? (
+          {hasDiscount ? (
             <>
               <span className="font-semibold text-primary">{formatPrice(product.discountPrice)}</span>
               <span className="text-sm text-muted-foreground line-through">{formatPrice(product.price)}</span>

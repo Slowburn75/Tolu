@@ -9,7 +9,11 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-  const discount = product.discountPrice ? calculateDiscount(product.price, product.discountPrice) : 0;
+  const availableStock = product.stockQuantity ?? product.stock ?? 0;
+  const rating = product.averageRating ?? product.rating ?? 0;
+  const reviewCount = product.reviewCount ?? product._count?.reviews ?? 0;
+  const hasDiscount = Number(product.discountPrice || 0) > 0 && Number(product.discountPrice) < Number(product.price);
+  const discount = hasDiscount ? calculateDiscount(product.price, product.discountPrice) : 0;
 
   return (
     <div className="space-y-6">
@@ -24,17 +28,17 @@ export function ProductInfo({ product }: ProductInfoProps) {
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={`h-4 w-4 ${i < Math.round(product.averageRating || product.rating || 0) ? "fill-foreground text-foreground" : "text-muted-foreground"}`}
+              className={`h-4 w-4 ${i < Math.round(rating) ? "fill-foreground text-foreground" : "text-muted-foreground"}`}
             />
           ))}
         </div>
         <span className="text-sm text-muted-foreground">
-          {(product.averageRating || product.rating || 0).toFixed(1)} ({getRatingLabel(product.averageRating || product.rating || 0)}) - {product.reviewCount || product._count?.reviews || 0} reviews
+          {reviewCount > 0 ? `${rating.toFixed(1)} - ${reviewCount} ${reviewCount === 1 ? "review" : "reviews"}` : "No reviews yet"}
         </span>
       </div>
 
       <div className="flex items-baseline gap-3">
-        {product.discountPrice ? (
+        {hasDiscount ? (
           <>
             <span className="text-3xl font-bold text-primary">{formatPrice(product.discountPrice)}</span>
             <span className="text-xl text-muted-foreground line-through">{formatPrice(product.price)}</span>
@@ -49,9 +53,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-      {product.stock > 0 ? (
+      {availableStock > 0 ? (
         <p className="text-sm text-green-600 font-medium flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-green-600" /> In Stock ({product.stock} available)
+          <span className="h-2 w-2 rounded-full bg-green-600" /> In Stock ({availableStock} available)
         </p>
       ) : (
         <p className="text-sm text-red-600 font-medium flex items-center gap-1">

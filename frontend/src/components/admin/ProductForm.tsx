@@ -76,7 +76,6 @@ export function ProductForm({ defaultValues, categories = [], brands = [], onSub
     formData.append("colors", JSON.stringify(selectedColors));
     images.forEach((img) => formData.append("images", img));
     if (videoFile) formData.append("video", videoFile);
-    images.forEach((img) => formData.append("images", img));
     await onSubmit(formData);
   };
 
