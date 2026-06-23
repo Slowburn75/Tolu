@@ -12,11 +12,11 @@
     --popover-foreground: 0 0% 0%;
     --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
+    --secondary: 42 24% 94%;
     --secondary-foreground: 0 0% 0%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
+    --accent: 38 34% 90%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
@@ -97,4 +97,23 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
+}
+
+
+@layer base {
+  h1, h2, h3 {
+    letter-spacing: 0;
+  }
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .bg-background\/92 {
+    background-color: hsl(var(--background) / 0.92);
+  }
+  .text-white\/78 {
+    color: rgb(255 255 255 / 0.78);
+  }
 }
